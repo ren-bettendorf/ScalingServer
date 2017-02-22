@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.channels.*;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 import cs455.scaling.threads.*;
 
@@ -15,7 +16,8 @@ public class Server {
 	private final String hostAddress;
 	private Selector selector;
 	private ThreadPoolManager threadPoolManager;
-	
+	private int buffSize = 8192;
+
 	public Server(int port, int numberThreads) throws IOException{
 		this.port = port;
 		this.numberThreads = numberThreads;
@@ -69,7 +71,7 @@ public class Server {
 		while(true) {
 			this.selector.select();
 			
-			Iterator keys = this.selected.selectedKeys().iterator();
+			Iterator keys = this.selector.selectedKeys().iterator();
 
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
@@ -106,7 +108,7 @@ public class Server {
 				read = channel.read(buffer);
 			}
 		} catch(IOException ioe) {
-			server.discconect(key);
+			// Disconnect the key!!! TODO
 			return;
 		}
 		key.interestOps(SelectionKey.OP_WRITE);
