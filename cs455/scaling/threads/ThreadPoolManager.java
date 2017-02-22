@@ -4,25 +4,18 @@ import java.util.LinkedList;
 
 public class ThreadPoolManager {
 
-	private final int threadPoolSize;
-	private LinkedList<Worker> threadPool;
+	private ThreadPool threadPool;
+	private LinkedList<Task> tasks;
 
 	public ThreadPoolManager(int threadPoolSize) {
-		this.threadPool = new LinkedList<Worker>();
-		this.threadPoolSize = threadPoolSize;
-		for(int i = 0; i < threadPoolSize; i++) {
-			Worker worker = new Worker(this);
-			threadPool.add(worker);
-			new Thread(worker).start();
-		}
+		this.threadPool = new ThreadPool(threadPoolSize);
+		this.tasks = new LinkedList<Task>();
 	}
 
-
-	public void addBackToPool(Worker worker) {
-		synchronized(threadPool) {
-			threadPool.add(worker);
+	public void addTask(Task task) {
+		synchronized(tasks) {
+			tasks.add(task);
 		}
-
 	}
 
 }

@@ -2,18 +2,19 @@ package cs455.scaling.threads;
 
 public class Worker implements Runnable {
 	
-	private ThreadPoolManager manager;
+	private ThreadPool pool;
 
-	public Worker(ThreadPoolManager threadPoolManager) {
-		this.manager = threadPoolManager;
+	public Worker(ThreadPool pool) {
+		this.pool = pool;
 	}
 
 	@Override
 	public void run() {
 		
 
-
-		manager.addBackToPool(this);
+		while(true) {
+			pool.addBackToPool(this);
+		}
 	}
 
 }
