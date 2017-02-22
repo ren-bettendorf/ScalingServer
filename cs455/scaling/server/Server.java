@@ -28,26 +28,29 @@ public class Server {
 			uhe.printStackTrace();
 		}
 		this.hostAddress = tempHost;
-
+		this.threadPoolManager = new ThreadPoolManager(numberThreads);
 		startServer();
 	}
 
 	public static void main(String[] args) {
-		System.out.println("Yarp");
-	
 		if(args.length != 2) {
 			System.out.println("Arguments not correct port number-of-threads");
 			System.exit(0);
 		}
 		int port = -1;
 		int numberThreads = -1;
-			
+
 		try {
 			port = Integer.parseInt(args[0]);
 			numberThreads = Integer.parseInt(args[1]);
 		} catch(NumberFormatException nfe) {
 			System.out.println("Something went wrong with parsing port and number of threads");
 			System.exit(0);
+		}
+		try {
+			System.out.println("Starting server: " + InetAddress.getLocalHost().getHostAddress() + ":"+ port + " with " + numberThreads + " threads");
+		} catch (UnknownHostException uhe) {
+			System.out.println("Something went wrong with localhost");
 		}
 		try{
 			new Server(port, numberThreads);
@@ -80,9 +83,9 @@ public class Server {
 						this.accept(key);
 					}else if(key.isReadable()) {
 						this.read(key);
-					}else if(key.isWritable()) {
-						this.write(key);
-					}
+					}//else if(key.isWritable()) {
+					//	this.write(key);
+					//}
 				}
 			}
 		}

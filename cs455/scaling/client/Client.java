@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.*;
 import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.Random;
 
 public class Client {
 	private LinkedList<String> hashcodes;
@@ -49,5 +50,13 @@ public class Client {
 		SocketChannel channel = (SocketChannel) key.channel();
 		channel.finishConnect();
 		key.interestOps(SelectionKey.OP_WRITE);
+	}
+
+	private byte[] createRandomData() {
+		byte[] data = new byte[buffSize];
+
+		(new Random()).nextBytes(data);
+
+		return data;
 	}
 }

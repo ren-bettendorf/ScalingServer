@@ -8,8 +8,9 @@ public class ThreadPool {
 
 	public ThreadPool(int threadPoolSize) {
 		threadPool = new LinkedList<Worker>();
-
+		System.out.println("Creatin ThreadPool of size " + threadPoolSize);
 		for(int i = 0; i < threadPoolSize; i++) {
+			System.out.println("Creating worker thread " + (i+1));
 			Worker worker = new Worker(this);
 			threadPool.add(worker);
 			new Thread(worker).start();
