@@ -6,7 +6,6 @@ public class ThreadPoolManager {
 
 	private final int threadPoolSize;
 	private LinkedList<Worker> threadPool;
-	private LinkedList<Task> tasks;
 
 	public ThreadPoolManager(int threadPoolSize) {
 		this.threadPool = new LinkedList<Worker>();
@@ -16,8 +15,6 @@ public class ThreadPoolManager {
 			threadPool.add(worker);
 			new Thread(worker).start();
 		}
-
-		this.tasks = new LinkedList<Task>();
 	}
 
 
