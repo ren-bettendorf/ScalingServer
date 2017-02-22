@@ -12,7 +12,7 @@ public class ThreadPoolManager {
 		this.threadPool = new LinkedList<Worker>();
 		this.threadPoolSize = threadPoolSize;
 		for(int i = 0; i < threadPoolSize; i++) {
-			Worker worker = new Worker();
+			Worker worker = new Worker(this);
 			threadPool.add(worker);
 			new Thread(worker).start();
 		}
@@ -21,6 +21,11 @@ public class ThreadPoolManager {
 	}
 
 
+	public void addBackToPool(Worker worker) {
+		synchronized(threadPool) {
+			threadPool.add(worker);
+		}
 
+	}
 
 }
