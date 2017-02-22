@@ -27,7 +27,7 @@ public class Server {
 		}
 		this.hostAddress = tempHost;
 
-		runServer();
+		startServer();
 	}
 
 	public static void main(String[] args) {
@@ -56,7 +56,7 @@ public class Server {
 		}
 	}
 
-	public void runServer() throws IOException {
+	public void startServer() throws IOException {
 		this.selector = Selector.open();
 		
 		ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
@@ -65,8 +65,60 @@ public class Server {
 		serverSocketChannel.socket().bind(new InetSocketAddress(hostAddress, port));
 
 		serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
+		
+		while(true) {
+			this.selector.select();
+			
+			Iterator keys = this.selected.selectedKeys().iterator();
 
+			while(keys.hasNext()) {
+				SelectionKey key = (SelectionKey) keys.next();
+				if(key.isValid()) {
+					if(key.isAcceptable()) {
+						this.accept(key);
+					}else if(key.isReadable()) {
+						this.read(key);
+					}else if(key.isWritable()) {
+						this.write(key);
+					}
+				}
+			}
+		}
 	}
 
+	private void accept(SelectionKey key) throws IOException {
+		ServerSocketChannel servSocket = (ServerSocketChannel) key.channel();
+		SocketChannel channel = servSocket.accept();
 
+		System.out.println("Accepting incoming connection..");
+		channel.configureBlocking(false);
+		channel.register(selector, SelectionKey.OP_READ);
+	}
+
+	private void read(SelectionKey key) throws IOException {
+		SocketChannel channel = (SocketChannel) key.channel();
+
+		ByteBuffer buffer = ByteBuffer.allocate(buffSize);
+		int read = 0;
+
+		try {
+			while(buffer.hasRemaining() && read != -1) {
+				read = channel.read(buffer);
+			}
+		} catch(IOException ioe) {
+			server.discconect(key);
+			return;
+		}
+		key.interestOps(SelectionKey.OP_WRITE);
+	}
+
+	private void write(SelectionKey key) throws IOException {
+		SocketChannel channel = (SocketChannel) key.channel();
+		// DATA NEEDS TO BE CREATED HERE
+		byte[] data = new byte[5];
+		
+		ByteBuffer buffer = ByteBuffer.wrap(data);
+		channel.write(buffer);
+		key.interestOps(SelectionKey.OP_READ);
+	}
 }
