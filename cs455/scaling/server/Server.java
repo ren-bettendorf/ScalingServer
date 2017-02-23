@@ -17,6 +17,7 @@ public class Server {
 	private Selector selector;
 	private ThreadPoolManager threadPoolManager;
 	private int buffSize = 8192;
+	private ServerSocketChannel serverSocketChannel;
 
 	public Server(int port, int numberThreads) throws IOException{
 		this.port = port;
@@ -64,7 +65,7 @@ public class Server {
 	public void startServer() throws IOException {
 		this.selector = Selector.open();
 		
-		ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+		this.serverSocketChannel = ServerSocketChannel.open();
 		serverSocketChannel.configureBlocking(false);
 
 		serverSocketChannel.socket().bind(new InetSocketAddress(hostAddress, port));
@@ -83,9 +84,9 @@ public class Server {
 						this.accept(key);
 					}else if(key.isReadable()) {
 						this.read(key);
-					}//else if(key.isWritable()) {
-					//	this.write(key);
-					//}
+					}else if(key.isWritable()) {
+						this.write(key);
+					}
 				}
 			}
 		}
@@ -111,7 +112,7 @@ public class Server {
 				read = channel.read(buffer);
 			}
 		} catch(IOException ioe) {
-			// Disconnect the key!!! TODO
+			
 			return;
 		}
 		key.interestOps(SelectionKey.OP_WRITE);

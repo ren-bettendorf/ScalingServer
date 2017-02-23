@@ -5,11 +5,11 @@ import java.util.LinkedList;
 public class ThreadPoolManager {
 
 	private ThreadPool threadPool;
-	private LinkedList<Task> tasks;
+	private BlockingLinkedQueue tasks;
 
 	public ThreadPoolManager(int threadPoolSize) {
 		this.threadPool = new ThreadPool(threadPoolSize);
-		this.tasks = new LinkedList<Task>();
+		this.tasks = new BlockingLinkedQueue();
 	}
 
 	public void addTask(Task task) {
