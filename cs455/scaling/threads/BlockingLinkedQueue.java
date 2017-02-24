@@ -21,6 +21,10 @@ public class BlockingLinkedQueue {
 		}
 		return output;
 	}
+	
+	public synchronized int getSize() {
+		return tasks.size();
+	}
 
 	public synchronized boolean isEmpty() {
 		return tasks.isEmpty();

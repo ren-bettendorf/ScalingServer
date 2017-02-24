@@ -8,8 +8,12 @@ public class ThreadPoolManager {
 	private BlockingLinkedQueue tasks;
 
 	public ThreadPoolManager(int threadPoolSize) {
-		this.threadPool = new ThreadPool(threadPoolSize);
+		//this.threadPool = new ThreadPool(threadPoolSize);
 		this.tasks = new BlockingLinkedQueue();
+	}
+	
+	public void initializeThreadPool(int threadPoolSize) {
+		this.threadPool = new ThreadPool(threadPoolSize);
 	}
 
 	public void addTask(Task task) {
@@ -17,9 +21,12 @@ public class ThreadPoolManager {
 	}
 
 	public void startTask() {
-		while(!tasks.isEmpty() && !threadPool.isEmpty())
-		{
-			threadPool.runTask(tasks.poll());
+		while(true) {
+			while(!tasks.isEmpty() && !threadPool.isEmpty())
+			{
+				System.out.println(tasks.getSize() + " " + threadPool.getSize());
+				threadPool.runTask(tasks.poll());
+			}
 		}
 	}
 }

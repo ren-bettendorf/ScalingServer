@@ -8,7 +8,7 @@ public class ThreadPool {
 
 	public ThreadPool(int threadPoolSize) {
 		threadPool = new LinkedList<Worker>();
-		System.out.println("Creatin ThreadPool of size " + threadPoolSize);
+		System.out.println("Creating ThreadPool of size " + threadPoolSize);
 		for(int i = 0; i < threadPoolSize; i++) {
 			System.out.println("Creating worker thread " + (i+1));
 			Worker worker = new Worker(this);
@@ -35,6 +35,12 @@ public class ThreadPool {
 	public boolean isEmpty() {
 		synchronized(threadPool) {
 			return threadPool.isEmpty(); 
+		}
+	}
+
+	public int getSize() {
+		synchronized(threadPool) {
+			return threadPool.size();
 		}
 	}
 }

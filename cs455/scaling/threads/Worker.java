@@ -5,26 +5,29 @@ public class Worker implements Runnable {
 	private ThreadPool pool;
 	private Task currentTask;
 	private boolean taskStatus = false;
+	private final Object lock = new Object();
 
 	public Worker(ThreadPool pool) {
 		this.pool = pool;
 	}
 	
 	public void addTask(Task task) {
-		this.currentTask = task;
-		taskStatus = true;
+		synchronized(lock){
+			this.currentTask = task;
+			taskStatus = true;
+		}
 	}
 
 	@Override
 	public void run() {
-		
-
 		while(true) {
-			if(taskStatus) {
-				currentTask.run();
-				taskStatus = false;
+			synchronized(lock) {
+				if(taskStatus) {
+					currentTask.run();
+					taskStatus = false;
+					pool.addBackToPool(this);
+				}
 			}
-			pool.addBackToPool(this);
 		}
 	}
 
