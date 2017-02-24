@@ -1,11 +1,9 @@
 package cs455.scaling.threads;
 
-public class Task {
+public interface Task extends Runnable {
 
-	public Task() {
+	@Override
+	public void run();
 
-
-	}
-
-
+	public int getTaskType(); 
 }
