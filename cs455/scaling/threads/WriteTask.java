@@ -7,16 +7,20 @@ public class WriteTask implements Task, TaskType {
 
 	private SelectionKey key;
 	private SocketChannel channel;
-	private int type;
+	private int type, bufferSize;
 
-	public WriteTask(SelectionKey key, SocketChannel channel) {
+	public WriteTask(SelectionKey key, SocketChannel channel, int bufferSize) {
 		this.key = key;
 		this.channel = channel;
 		this.type = TaskType.WRITE_TASK;
+		this.bufferSize = bufferSize;
 	}
 	
 	@Override
-	public void run() {  }
+	public void run() {  
+		
+
+	}
 
 	@Override
 	public int getTaskType() {
