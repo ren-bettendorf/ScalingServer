@@ -13,9 +13,13 @@ public class ThreadPoolManager {
 	}
 
 	public void addTask(Task task) {
-		synchronized(tasks) {
-			tasks.add(task);
-		}
+		tasks.add(task);
 	}
 
+	public void startTask() {
+		while(!tasks.isEmpty() && !threadPool.isEmpty())
+		{
+			threadPool.runTask(tasks.poll());
+		}
+	}
 }

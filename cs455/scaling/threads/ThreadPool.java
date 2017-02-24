@@ -17,11 +17,24 @@ public class ThreadPool {
 		}
 	}
 
+	public void runTask(Task task) {
+		synchronized(threadPool) {
+			Worker worker = threadPool.poll();
+			worker.addTask(task);
+		}
+	}
+
 	public void addBackToPool(Worker worker) {
 		synchronized(threadPool) {
 			if(!threadPool.contains(worker)) {
 				threadPool.add(worker);
 			}
+		}
+	}
+
+	public boolean isEmpty() {
+		synchronized(threadPool) {
+			return threadPool.isEmpty(); 
 		}
 	}
 }
