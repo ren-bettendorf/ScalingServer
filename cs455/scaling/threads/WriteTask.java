@@ -3,27 +3,21 @@ package cs455.scaling.threads;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-public class WriteTask implements Task, TaskType {
+public class WriteTask implements Task{
 
 	private SelectionKey key;
 	private SocketChannel channel;
-	private int type, bufferSize;
+	private int bufferSize;
 
 	public WriteTask(SelectionKey key, SocketChannel channel, int bufferSize) {
 		this.key = key;
 		this.channel = channel;
-		this.type = TaskType.WRITE_TASK;
 		this.bufferSize = bufferSize;
 	}
 	
 	@Override
-	public void run() {  
+	public void startTask() {  
 		
 
-	}
-
-	@Override
-	public int getTaskType() {
-		return this.type;
 	}
 }

@@ -13,23 +13,15 @@ public class DummyTask implements Task {
 
 
 	@Override
-	public void run() {
-		synchronized(System.out){
-			System.out.println("Starting task: " + taskNumber + " sleeping for " + sleepTime);
-		}
+	public void startTask() {
+		System.out.println("Starting task: " + taskNumber + " sleeping for " + sleepTime);
+		
 		try {
 			Thread.sleep(sleepTime);
 		}catch(InterruptedException ie) {
 			ie.printStackTrace();
 		}
-		synchronized(System.out) {
-			System.out.println("Ending Task: " + taskNumber);
-		}
+		
+		System.out.println("Ending Task: " + taskNumber);
 	}
-
-	@Override
-	public int getTaskType() {
-		return -1;
-	}
-
 }

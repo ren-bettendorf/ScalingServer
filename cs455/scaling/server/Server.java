@@ -29,7 +29,8 @@ public class Server {
 			uhe.printStackTrace();
 		}
 		this.hostAddress = tempHost;
-		this.threadPoolManager = new ThreadPoolManager(numberThreads);
+		this.threadPoolManager = new ThreadPoolManager();
+		this.threadPoolManager.initializeThreadPool(numberThreads);
 		startServer();
 	}
 

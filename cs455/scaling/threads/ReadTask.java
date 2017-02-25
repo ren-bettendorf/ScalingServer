@@ -5,21 +5,20 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
-public class ReadTask implements Task, TaskType {
+public class ReadTask implements Task{
 
 	private SelectionKey key;
 	private SocketChannel channel;
-	private int type, bufferSize;
+	private int bufferSize;
 
 	public ReadTask(SelectionKey key, SocketChannel channel, int bufferSize) {
 		this.key = key;
 		this.channel = channel;
-		this.type = TaskType.READ_TASK;
 		this.bufferSize = bufferSize;
 	}
 
 	@Override
-	public void run() {
+	public void startTask() {
 		ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 		int read = 0;
 
@@ -36,10 +35,5 @@ public class ReadTask implements Task, TaskType {
 
 		buffer.clear();
 		key.interestOps(SelectionKey.OP_WRITE);
-	}
-
-	@Override
-	public int getTaskType() {
-		return type;
 	}
 }

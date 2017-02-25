@@ -7,8 +7,7 @@ public class ThreadPoolManager {
 	private ThreadPool threadPool;
 	private BlockingLinkedQueue tasks;
 
-	public ThreadPoolManager(int threadPoolSize) {
-		//this.threadPool = new ThreadPool(threadPoolSize);
+	public ThreadPoolManager() {
 		this.tasks = new BlockingLinkedQueue();
 	}
 	
@@ -24,7 +23,6 @@ public class ThreadPoolManager {
 		while(true) {
 			while(!tasks.isEmpty() && !threadPool.isEmpty())
 			{
-				System.out.println(tasks.getSize() + " " + threadPool.getSize());
 				threadPool.runTask(tasks.poll());
 			}
 		}
