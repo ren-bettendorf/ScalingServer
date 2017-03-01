@@ -19,13 +19,13 @@ public class WriteTask extends Task{
 	@Override
 	public void startTask() {  
 		try {
-            ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
-            buffer.rewind();
-            channel.write(buffer);
-            key.interestOps(SelectionKey.OP_READ);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+	        	System.out.println("Writing: " + data);
+			ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
+        		buffer.rewind();
+			channel.write(buffer);
+            		key.interestOps(SelectionKey.OP_READ);
+        	} catch (IOException e) {
+            		e.printStackTrace();
+        	}
 	}
 }
