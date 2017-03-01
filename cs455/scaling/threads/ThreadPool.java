@@ -29,9 +29,12 @@ public class ThreadPool {
 	public void addBackToPool(Worker worker) {
 		synchronized(threadPool) {
 			if(!threadPool.contains(worker)) {
-				if(manager.checkForMoreTasks()) {
+				System.out.println("Worker not in pool.");
+				if(!manager.checkForMoreTasks()) {
+					System.out.println("Adding task back to worker");
 					worker.addTask(manager.removeTask());
 				} else {
+					System.out.println("No more tasks adding back to pool");
 					threadPool.add(worker);
 				}
 			}

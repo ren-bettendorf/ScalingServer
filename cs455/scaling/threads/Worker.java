@@ -24,7 +24,7 @@ public class Worker implements Runnable {
 			synchronized(lock) {
 				if(taskStatus) {
 					currentTask.startTask();
-					currentTask = null;
+					
 					taskStatus = false;
 					pool.addBackToPool(this);
 				}
