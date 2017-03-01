@@ -16,8 +16,8 @@ public class Server {
 	private final String hostAddress;
 	private Selector selector;
 	private ThreadPoolManager threadPoolManager;
-	private int buffSize = 8192;
 	private ServerSocketChannel serverSocketChannel;
+	private HashMap<SelectionKey, ByteBuffer> buffers;
 
 	public Server(int port, int numberThreads) throws IOException{
 		this.port = port;
@@ -31,6 +31,7 @@ public class Server {
 		this.hostAddress = tempHost;
 		this.threadPoolManager = new ThreadPoolManager();
 		this.threadPoolManager.initializeThreadPool(numberThreads);
+		this.buffers = new HashMap<SelectionKey, ByteBuffer>();
 		startServer();
 	}
 
@@ -68,9 +69,7 @@ public class Server {
 		
 		this.serverSocketChannel = ServerSocketChannel.open();
 		serverSocketChannel.configureBlocking(false);
-
 		serverSocketChannel.socket().bind(new InetSocketAddress(hostAddress, port));
-
 		serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
 		
 		while(true) {
@@ -80,15 +79,15 @@ public class Server {
 
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
-				if(key.isValid()) {
-					if(key.isAcceptable()) {
-						this.accept(key);
-					}else if(key.isReadable()) {
-						this.read(key);
-					}else if(key.isWritable()) {
-						this.write(key);
-					}
+				if(!key.isValid()) {
+					continue;
 				}
+				if(key.isAcceptable()) {
+					this.accept(key);
+				}else if(key.isReadable()) {
+					this.read(key);
+				}
+				keys.remove();
 			}
 		}
 	}
@@ -105,27 +104,6 @@ public class Server {
 	private void read(SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
 
-		ByteBuffer buffer = ByteBuffer.allocate(buffSize);
-		int read = 0;
-
-		try {
-			while(buffer.hasRemaining() && read != -1) {
-				read = channel.read(buffer);
-			}
-		} catch(IOException ioe) {
-			
-			return;
-		}
-		key.interestOps(SelectionKey.OP_WRITE);
-	}
-
-	private void write(SelectionKey key) throws IOException {
-		SocketChannel channel = (SocketChannel) key.channel();
-		// DATA NEEDS TO BE CREATED HERE
-		byte[] data = new byte[5];
-		
-		ByteBuffer buffer = ByteBuffer.wrap(data);
-		channel.write(buffer);
-		key.interestOps(SelectionKey.OP_READ);
+		threadPoolManager.addTask(key, channel, threadPoolManager);
 	}
 }

@@ -7,17 +7,23 @@ public class WriteTask implements Task{
 
 	private SelectionKey key;
 	private SocketChannel channel;
-	private int bufferSize;
-
-	public WriteTask(SelectionKey key, SocketChannel channel, int bufferSize) {
+	private String data;
+	public WriteTask(SelectionKey key, SocketChannel channel, String data) {
 		this.key = key;
 		this.channel = channel;
-		this.bufferSize = bufferSize;
+		this.data = data;
 	}
 	
 	@Override
 	public void startTask() {  
-		
+		try {
+            ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
+            buffer.rewind();
+            channel.write(buffer);
+            key.interestOps(SelectionKey.OP_READ);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
 	}
 }
