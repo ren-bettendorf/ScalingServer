@@ -12,9 +12,11 @@ public class Worker implements Runnable {
 	}
 	
 	public void addTask(Task task) {
-		synchronized(lock){
-			this.currentTask = task;
-			taskStatus = true;
+		if(task != null) {
+			synchronized(lock){
+				this.currentTask = task;
+				taskStatus = true;
+			}
 		}
 	}
 

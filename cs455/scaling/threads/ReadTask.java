@@ -24,10 +24,12 @@ public class ReadTask extends Task{
 	public void startTask() {
 		ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 		int read = 0;
-
+		buffer.clear();
 		try {
-			System.out.println("Read data...");
-            		read = channel.read(buffer);
+			System.out.println("Reading data...");
+			while(buffer.hasRemaining() && read != -1) {
+            			read = channel.read(buffer);
+			}
 
             		if (read == -1) {
                 		System.out.println("Connection closed by client: " + channel.socket().getRemoteSocketAddress());
@@ -35,15 +37,12 @@ public class ReadTask extends Task{
                 		key.cancel();
                 		return;
             		}
-			byte[] data = null;
-			if(buffer.hasArray()) {
-				data = buffer.array();
-			}
-			
-			buffer.clear();
+			byte[] data = new byte[bufferSize];
+			System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
+
 			key.interestOps(SelectionKey.OP_WRITE);
 	            	WriteTask writeTask = new WriteTask(key, channel, HashingFunction.getInstance().SHA1FromBytes(data));
-			
+			System.out.println(HashingFunction.getInstance().SHA1FromBytes(data));
             		threadPoolManager.addTask(writeTask);
         	} catch (IOException ioe ) {
 			ioe.printStackTrace();

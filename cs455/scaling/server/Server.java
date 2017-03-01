@@ -18,7 +18,6 @@ public class Server {
 	private Selector selector;
 	private ThreadPoolManager threadPoolManager;
 	private ServerSocketChannel serverSocketChannel;
-	private HashMap<SelectionKey, ByteBuffer> buffers;
 
 	public Server(int port, int numberThreads) throws IOException{
 		this.port = port;
@@ -32,8 +31,7 @@ public class Server {
 		this.hostAddress = tempHost;
 		this.threadPoolManager = new ThreadPoolManager();
 		this.threadPoolManager.initializeThreadPool(numberThreads);
-		//this.threadPoolManager.startTask();
-		this.buffers = new HashMap<SelectionKey, ByteBuffer>();
+
 		startServer();
 	}
 
@@ -82,6 +80,7 @@ public class Server {
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
 				keys.remove();
+
 				if(!key.isValid()) {
 					continue;
 				}

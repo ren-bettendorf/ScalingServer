@@ -9,6 +9,9 @@ import java.nio.channels.*;
 import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.Random;
+import java.security.NoSuchAlgorithmException;
+
+import cs455.scaling.util.HashingFunction;
 
 public class Client {
 	private LinkedList<String> hashcodes;
@@ -75,20 +78,27 @@ public class Client {
 				}else if(key.isWritable()) {
 					try {
 						Thread.sleep(5000);
-					} catch(Exception e) { e.printStackTrace(); }
-
-					for(int i = 0; i < 10; i++) {
-						byte[] dataToBeWritten = createRandomData();
-						System.out.println("Writing: " + dataToBeWritten.toString());
+					} catch(Exception e) { 
+						e.printStackTrace(); 
+					}
+					byte[] dataToBeWritten = createRandomData();
+					try {
+						System.out.println("Writing: " + HashingFunction.getInstance().SHA1FromBytes(dataToBeWritten));
 						channel.write(ByteBuffer.wrap(dataToBeWritten));
+						key.interestOps(SelectionKey.OP_READ);
+					} catch(NoSuchAlgorithmException nsae) {
+						nsae.printStackTrace();
 					}
 				}else if(key.isReadable()) {
 					System.out.println("Reading data from server...");
 					ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
+					buffer.clear();
 					int read = 0;
 
 					try {
-						read = channel.read(buffer);
+						while(buffer.hasRemaining() && read != -1) {
+							read = channel.read(buffer);
+						}
 
 						if(read == -1) {
 							System.out.println("Something went wrong...");
@@ -96,16 +106,14 @@ public class Client {
 							key.cancel();
 							return;
 						}
-						byte[] data = null;
-						if(buffer.hasArray()) {
-							data = buffer.array();
-						}
+						byte[] data = new byte[8000];
+						System.arraycopy(buffer.array(), 0, data, 0, 8000);
 
-						buffer.clear();
 						System.out.println("Arrived: " + data.toString());
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
+					key.interestOps(SelectionKey.OP_WRITE);
 				}
 			}
 		}
