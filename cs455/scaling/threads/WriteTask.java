@@ -1,9 +1,11 @@
 package cs455.scaling.threads;
 
+import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.nio.ByteBuffer;
 
-public class WriteTask implements Task{
+public class WriteTask extends Task{
 
 	private SelectionKey key;
 	private SocketChannel channel;

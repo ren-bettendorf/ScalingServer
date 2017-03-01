@@ -2,7 +2,7 @@ package cs455.scaling.threads;
 
 import java.lang.InterruptedException;
 
-public class DummyTask implements Task {
+public class DummyTask extends Task {
 	
 	private final int sleepTime, taskNumber;
 

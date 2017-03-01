@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import java.nio.channels.*;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
+import java.util.HashMap;
 
 import cs455.scaling.threads.*;
 
@@ -104,6 +105,6 @@ public class Server {
 	private void read(SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
 
-		threadPoolManager.addTask(key, channel, threadPoolManager);
+		threadPoolManager.addTask(new ReadTask(key, channel, threadPoolManager));
 	}
 }

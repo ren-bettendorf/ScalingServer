@@ -1,5 +1,6 @@
 package cs455.scaling.threads;
 
+import java.security.NoSuchAlgorithmException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -7,7 +8,7 @@ import java.nio.channels.SocketChannel;
 
 import cs455.scaling.util.HashingFunction;
 
-public class ReadTask implements Task{
+public class ReadTask extends Task{
 
 	private SelectionKey key;
 	private SocketChannel channel;
@@ -25,14 +26,14 @@ public class ReadTask implements Task{
 		int read = 0;
 
 		try {
-            int read = channel.read(buffer);
+            		read = channel.read(buffer);
 
-            if (read == -1) {
-                System.out.println("Connection closed by client: " + channel.socket().getRemoteSocketAddress());
-                channel.close();
-                selectionKey.cancel();
-                return;
-            }
+            		if (read == -1) {
+                		System.out.println("Connection closed by client: " + channel.socket().getRemoteSocketAddress());
+                		channel.close();
+                		key.cancel();
+                		return;
+            		}
 			byte[] data = null;
 			if(buffer.hasArray()) {
 				data = buffer.array();
@@ -40,11 +41,13 @@ public class ReadTask implements Task{
 			
 			buffer.clear();
 			key.interestOps(SelectionKey.OP_WRITE);
-            WriteTask writeTask = new WriteTask(selectionKey, channel, HashingFunction.getInstance().SHA1FromBytes(data));
+	            	WriteTask writeTask = new WriteTask(key, channel, HashingFunction.getInstance().SHA1FromBytes(data));
 			
-            threadPoolManager.addTask(writeTask);
-        } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+            		threadPoolManager.addTask(writeTask);
+        	} catch (IOException ioe ) {
+			ioe.printStackTrace();
+		} catch ( NoSuchAlgorithmException nsae) {
+            		nsae.printStackTrace();
+        	}
 	}
 }
