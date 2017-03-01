@@ -112,8 +112,9 @@ public class Client {
 
 	private void connect(SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
-		channel.finishConnect();
-		key.interestOps(SelectionKey.OP_WRITE);
+		if(channel.finishConnect()) {
+			key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+		}
 	}
 
 	private byte[] createRandomData() {
