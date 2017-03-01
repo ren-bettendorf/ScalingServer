@@ -32,6 +32,7 @@ public class Server {
 		this.hostAddress = tempHost;
 		this.threadPoolManager = new ThreadPoolManager();
 		this.threadPoolManager.initializeThreadPool(numberThreads);
+		this.threadPoolManager.startTask();
 		this.buffers = new HashMap<SelectionKey, ByteBuffer>();
 		startServer();
 	}
