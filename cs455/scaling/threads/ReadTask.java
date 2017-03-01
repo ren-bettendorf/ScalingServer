@@ -26,6 +26,7 @@ public class ReadTask extends Task{
 		int read = 0;
 
 		try {
+			System.out.println("Read data...");
             		read = channel.read(buffer);
 
             		if (read == -1) {

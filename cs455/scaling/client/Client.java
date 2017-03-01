@@ -13,7 +13,7 @@ import java.util.Random;
 public class Client {
 	private LinkedList<String> hashcodes;
 	private Selector selector;
-	private final int buffSize = 8000;
+	private final int bufferSize = 8000;
 	private final int messageRate;
 
 	public Client(String serverHost, int port, int messageRate) throws IOException {
@@ -70,9 +70,42 @@ public class Client {
 				
 				if(key.isConnectable()){
 					this.connect(key);
+				}else if(key.isWritable()) {
+					try {
+						Thread.sleep(5000);
+					} catch(Exception e) { e.printStackTrace(); }
+
+					for(int i = 0; i < 10; i++) {
+						byte[] dataToBeWritten = createRandomData();
+						System.out.println("Writing: " + dataToBeWritten.toString());
+						channel.write(ByteBuffer.wrap(dataToBeWritten));
+					}
 				}else if(key.isReadable()) {
-					ByteBuffer buffer = ByteBuffer.allocate(buffSize);
+					System.out.println("Reading data from server...");
+					ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
+					int read = 0;
+
+					try {
+						read = channel.read(buffer);
+
+						if(read == -1) {
+							System.out.println("Something went wrong...");
+							channel.close();
+							key.cancel();
+							return;
+						}
+						byte[] data = null;
+						if(buffer.hasArray()) {
+							data = buffer.array();
+						}
+
+						buffer.clear();
+						System.out.println("Arrived: " + data.toString());
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
 				}
+				keys.remove();
 			}
 		}
 	}
@@ -84,7 +117,7 @@ public class Client {
 	}
 
 	private byte[] createRandomData() {
-		byte[] data = new byte[buffSize];
+		byte[] data = new byte[bufferSize];
 
 		(new Random()).nextBytes(data);
 

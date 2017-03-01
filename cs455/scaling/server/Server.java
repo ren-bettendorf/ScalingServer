@@ -75,20 +75,21 @@ public class Server {
 		
 		while(true) {
 			this.selector.select();
-			
+
 			Iterator keys = this.selector.selectedKeys().iterator();
 
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
+				keys.remove();
 				if(!key.isValid()) {
 					continue;
 				}
+
 				if(key.isAcceptable()) {
 					this.accept(key);
 				}else if(key.isReadable()) {
 					this.read(key);
 				}
-				keys.remove();
 			}
 		}
 	}

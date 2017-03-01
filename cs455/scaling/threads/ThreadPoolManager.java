@@ -16,6 +16,7 @@ public class ThreadPoolManager {
 	}
 
 	public void addTask(Task task) {
+		System.out.println("Adding task");
 		tasks.add(task);
 	}
 
@@ -23,6 +24,7 @@ public class ThreadPoolManager {
 		while(true) {
 			while(!tasks.isEmpty() && !threadPool.isEmpty())
 			{
+				System.out.println("Starting another task");
 				threadPool.runTask(tasks.poll());
 			}
 		}
