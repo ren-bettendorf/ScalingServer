@@ -13,7 +13,6 @@ public class TestThreadPool {
 		}
 		manager.initializeThreadPool(10);
 		manager.startTask();
-
 	}
 
 }

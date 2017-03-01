@@ -12,7 +12,7 @@ public class ThreadPoolManager {
 	}
 	
 	public void initializeThreadPool(int threadPoolSize) {
-		this.threadPool = new ThreadPool(threadPoolSize);
+		this.threadPool = new ThreadPool(threadPoolSize, this);
 	}
 
 	public void addTask(Task task) {
@@ -20,13 +20,11 @@ public class ThreadPoolManager {
 		tasks.add(task);
 	}
 
-	public void startTask() {
-		while(true) {
-			while(!tasks.isEmpty() && !threadPool.isEmpty())
-			{
-				System.out.println("Starting another task");
-				threadPool.runTask(tasks.poll());
-			}
-		}
+	public boolean checkForMoreTasks() {
+		return tasks.isEmpty();
+	}
+	
+	public Task removeTask() {
+		return tasks.poll();
 	}
 }
