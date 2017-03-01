@@ -37,6 +37,12 @@ public class ThreadPool {
 			}
 		}
 	}
+	
+	public void giveWorkerTask(Task task) {
+		if(!isEmpty()) {
+			runTask(task);
+		}
+	}
 
 	public boolean isEmpty() {
 		synchronized(threadPool) {
