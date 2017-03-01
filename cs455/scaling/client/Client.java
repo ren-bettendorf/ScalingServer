@@ -67,9 +67,11 @@ public class Client {
 
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
-				
+				keys.remove();
 				if(key.isConnectable()){
-					this.connect(key);
+					if(channel.finishConnect()) {
+						key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+					}
 				}else if(key.isWritable()) {
 					try {
 						Thread.sleep(5000);
@@ -105,16 +107,13 @@ public class Client {
 						e.printStackTrace();
 					}
 				}
-				keys.remove();
 			}
 		}
 	}
 
 	private void connect(SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
-		if(channel.finishConnect()) {
-			key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-		}
+		
 	}
 
 	private byte[] createRandomData() {
