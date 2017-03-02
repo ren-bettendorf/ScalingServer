@@ -85,10 +85,11 @@ public class Client {
 					try {
 						System.out.println("Writing: " + HashingFunction.getInstance().SHA1FromBytes(dataToBeWritten));
 						channel.write(ByteBuffer.wrap(dataToBeWritten));
-						key.interestOps(SelectionKey.OP_READ);
+
 					} catch(NoSuchAlgorithmException nsae) {
 						nsae.printStackTrace();
 					}
+					key.interestOps(SelectionKey.OP_READ);
 				}else if(key.isReadable()) {
 					System.out.println("Reading data from server...");
 					ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
