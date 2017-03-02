@@ -21,9 +21,9 @@ public class WriteTask extends Task{
 		try {
 	        	System.out.println("Writing: " + data);
 			ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
-        		buffer.rewind();
+        		buffer.flip();
 			channel.write(buffer);
-            		key.interestOps(SelectionKey.OP_READ);
+            		//key.interestOps(SelectionKey.OP_READ);
         	} catch (IOException e) {
             		e.printStackTrace();
         	}

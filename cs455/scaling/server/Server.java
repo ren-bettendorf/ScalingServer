@@ -81,7 +81,7 @@ public class Server {
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
 				keys.remove();
-				synchronized(key) {
+				
 					if(!key.isValid()) {
 						continue;
 					}
@@ -91,7 +91,7 @@ public class Server {
 					}else if(key.isReadable()) {
 						this.read(key);
 					}
-				}
+				
 			}
 		}
 	}

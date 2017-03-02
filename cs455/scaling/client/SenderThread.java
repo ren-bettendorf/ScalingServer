@@ -25,7 +25,8 @@ public class SenderThread implements Runnable {
 		SocketChannel channel = (SocketChannel) key.channel();
 		while(true) {
 			byte[] dataToBeWritten = createRandomData();
-			//System.out.println("Writing: " + new String(dataToBeWritten));
+			ByteBuffer buffer = ByteBuffer.allocate(8000);
+			buffer.flip();
 			try {
 				channel.write(ByteBuffer.wrap(dataToBeWritten));
 			}catch(IOException ioe) {

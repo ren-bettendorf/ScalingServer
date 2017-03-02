@@ -44,9 +44,8 @@ public class ReadTask extends Task{
 			byte[] data = new byte[bufferSize];
 			System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
 
-			key.interestOps(SelectionKey.OP_WRITE);
+			//key.interestOps(SelectionKey.OP_WRITE);
 	            	WriteTask writeTask = new WriteTask(key, channel, HashingFunction.getInstance().SHA1FromBytes(data));
-			System.out.println(HashingFunction.getInstance().SHA1FromBytes(data));
             		threadPoolManager.addTask(writeTask);
         	} catch (IOException ioe ) {
 			ioe.printStackTrace();

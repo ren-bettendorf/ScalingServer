@@ -73,7 +73,7 @@ public class Client {
 				synchronized(key) {
 					if(key.isConnectable()){
 						if(channel.finishConnect()) {
-							key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+							key.interestOps(SelectionKey.OP_READ);
 							startSenderThread(key);
 						}
 					}else if(key.isReadable()) {
