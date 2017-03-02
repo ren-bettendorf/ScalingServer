@@ -9,7 +9,6 @@ import java.nio.channels.*;
 import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.Random;
-import java.security.NoSuchAlgorithmException;
 
 import cs455.scaling.util.HashingFunction;
 
@@ -21,8 +20,8 @@ public class Client {
 
 	public Client(String serverHost, int port, int messageRate) throws IOException {
 		this.hashcodes = new LinkedList<String>();
-		startClient(serverHost, port);
 		this.messageRate = messageRate;
+		startClient(serverHost, port);
 	}
 
 	public static void main(String[] args) {
@@ -74,22 +73,8 @@ public class Client {
 				if(key.isConnectable()){
 					if(channel.finishConnect()) {
 						key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+						startSenderThread(key);
 					}
-				}else if(key.isWritable()) {
-					try {
-						Thread.sleep(5000);
-					} catch(Exception e) { 
-						e.printStackTrace(); 
-					}
-					byte[] dataToBeWritten = createRandomData();
-					try {
-						System.out.println("Writing: " + HashingFunction.getInstance().SHA1FromBytes(dataToBeWritten));
-						channel.write(ByteBuffer.wrap(dataToBeWritten));
-
-					} catch(NoSuchAlgorithmException nsae) {
-						nsae.printStackTrace();
-					}
-					key.interestOps(SelectionKey.OP_READ);
 				}else if(key.isReadable()) {
 					System.out.println("Reading data from server...");
 					ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
@@ -114,22 +99,12 @@ public class Client {
 					} catch(Exception e) {
 						e.printStackTrace();
 					}
-					key.interestOps(SelectionKey.OP_WRITE);
 				}
 			}
 		}
 	}
 
-	private void connect(SelectionKey key) throws IOException {
-		SocketChannel channel = (SocketChannel) key.channel();
-		
-	}
-
-	private byte[] createRandomData() {
-		byte[] data = new byte[bufferSize];
-
-		(new Random()).nextBytes(data);
-
-		return data;
+	private void startSenderThread(SelectionKey key) {
+		new Thread(new SenderThread(key, messageRate)).start();
 	}
 }

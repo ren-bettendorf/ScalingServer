@@ -16,7 +16,6 @@ public class ThreadPoolManager {
 	}
 
 	public void addTask(Task task) {
-		System.out.println("Adding task");
 		tasks.add(task);
 		if(threadPool != null && !threadPool.isEmpty()) {
 			threadPool.giveWorkerTask(removeTask());
