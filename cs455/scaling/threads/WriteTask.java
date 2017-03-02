@@ -19,7 +19,7 @@ public class WriteTask extends Task{
 	@Override
 	public void startTask() {  
 		try {
-	        	System.out.println("Writing: " + data);
+	        	System.out.println("Writing[" + data.length + "]: " + data );
 			ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
         		buffer.flip();
 			buffer.wrap(data.getBytes());
