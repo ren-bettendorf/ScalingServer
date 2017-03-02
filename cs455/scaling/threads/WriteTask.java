@@ -20,8 +20,9 @@ public class WriteTask extends Task{
 	public void startTask() {  
 		try {
 	        	System.out.println("Writing: " + data);
-			ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
+			ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
         		buffer.flip();
+			buffer.wrap(data.getBytes());
 			channel.write(buffer);
             		//key.interestOps(SelectionKey.OP_READ);
         	} catch (IOException e) {
