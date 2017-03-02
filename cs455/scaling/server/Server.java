@@ -81,15 +81,16 @@ public class Server {
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
 				keys.remove();
+				synchronized(key) {
+					if(!key.isValid()) {
+						continue;
+					}
 
-				if(!key.isValid()) {
-					continue;
-				}
-
-				if(key.isAcceptable()) {
-					this.accept(key);
-				}else if(key.isReadable()) {
-					this.read(key);
+					if(key.isAcceptable()) {
+						this.accept(key);
+					}else if(key.isReadable()) {
+						this.read(key);
+					}
 				}
 			}
 		}
