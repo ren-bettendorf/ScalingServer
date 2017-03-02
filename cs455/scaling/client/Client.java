@@ -61,7 +61,7 @@ public class Client {
 		channel.configureBlocking(false);
 		channel.connect(new InetSocketAddress(serverHost, serverPort));
 		channel.register(selector, SelectionKey.OP_CONNECT);
-		ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
+		ByteBuffer buffer = ByteBuffer.allocate(40);
 		while(true) {
 			selector.select();
 

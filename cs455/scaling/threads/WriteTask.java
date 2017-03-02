@@ -19,8 +19,8 @@ public class WriteTask extends Task{
 	@Override
 	public void startTask() {  
 		try {
-	        	System.out.println("Writing[" + data.length + "]: " + data );
-			ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
+	        	System.out.println("Writing[" + data.getBytes().length + "]: " + data );
+			ByteBuffer buffer = ByteBuffer.allocate(40);
         		buffer.flip();
 			buffer.wrap(data.getBytes());
 			channel.write(buffer);
