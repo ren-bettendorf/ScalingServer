@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.HashMap;
 
 import cs455.scaling.threads.*;
+import cs455.scaling.util.State;
 
 public class Server {
 
@@ -100,12 +101,14 @@ public class Server {
 
 		System.out.println("Accepting incoming connection..");
 		channel.configureBlocking(false);
-		channel.register(selector, SelectionKey.OP_READ);
+		channel.register(selector, SelectionKey.OP_READ, new State());
 	}
 
 	private void read(SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
-
-		threadPoolManager.addTask(new ReadTask(key, channel, threadPoolManager));
+		State state = (State) key.attachment();
+		if(!state.getReadingState()) {
+			threadPoolManager.addTask(new ReadTask(key, channel, threadPoolManager));
+		}
 	}
 }

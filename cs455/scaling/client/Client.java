@@ -95,7 +95,7 @@ public class Client {
 						byte[] data = new byte[8000];
 						System.arraycopy(buffer.array(), 0, data, 0, 8000);
 
-						System.out.println("Arrived: " + data.toString());
+						System.out.println("Arrived: " + new String(data));
 					} catch(Exception e) {
 						e.printStackTrace();
 					}

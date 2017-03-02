@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
 import cs455.scaling.util.HashingFunction;
+import cs455.scaling.util.State;
 
 public class ReadTask extends Task{
 
@@ -22,9 +23,12 @@ public class ReadTask extends Task{
 
 	@Override
 	public void startTask() {
+		State state = (State) key.attachment();
+		state.setReadingState(true);
 		ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 		int read = 0;
 		buffer.clear();
+
 		try {
 			System.out.println("Reading data...");
 			while(buffer.hasRemaining() && read != -1) {
@@ -48,6 +52,8 @@ public class ReadTask extends Task{
 			ioe.printStackTrace();
 		} catch ( NoSuchAlgorithmException nsae) {
             		nsae.printStackTrace();
-        	}
+        	}finally {
+			state.setReadingState(false);
+		}
 	}
 }
