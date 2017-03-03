@@ -32,10 +32,10 @@ public class WriteTask extends Task{
 			ByteBuffer buffer = ByteBuffer.allocate(40);
         		buffer.flip();
 			buffer.wrap(data.getBytes());
-			synchronized(key) {
+			
 			channel.write(buffer);
             		key.interestOps(SelectionKey.OP_READ);
-			}
+			
         	} catch (IOException e) {
             		e.printStackTrace();
         	} finally {

@@ -12,7 +12,7 @@ import java.util.Random;
 import java.security.NoSuchAlgorithmException;
 
 public class SenderThread implements Runnable {
-	
+
 	private final int messageRate;
 	private SelectionKey key;
 	private Selector selector;

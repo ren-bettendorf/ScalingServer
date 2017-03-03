@@ -57,32 +57,32 @@ public class Client {
 	public void startClient(String serverHost, int serverPort) throws IOException {
 		this.selector = Selector.open();
 
-		SocketChannel channel = SocketChannel.open();
-		channel.configureBlocking(false);
-		channel.connect(new InetSocketAddress(serverHost, serverPort));
-		channel.register(selector, SelectionKey.OP_CONNECT);
+		SocketChannel socketChannel = SocketChannel.open();
+		socketChannel.configureBlocking(false);
+		socketChannel.connect(new InetSocketAddress(serverHost, serverPort));
+		socketChannel.register(selector, SelectionKey.OP_CONNECT);
 
 		while(true) {
 			selector.select();
-
+			System.out.println("SELECTING ALL THE THINGS " + selector.selectedKeys().size());
 			Iterator keys = selector.selectedKeys().iterator();
 			ByteBuffer buffer = ByteBuffer.allocate(40);
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
-				keys.remove();
+				//keys.remove();
 				synchronized(key) {
 				if(key.isConnectable()){
-					if(channel.finishConnect()) {
-						startSenderThread(key);
-						key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
-						System.out.println("Starting SenderThread...");
-					}
+					SocketChannel channel = (SocketChannel)key.channel();
+					channel.finishConnect();
+					startSenderThread(key);
+					key.interestOps(SelectionKey.OP_READ);
+					System.out.println("Starting SenderThread...");
 				}else if(key.isReadable()) {
 					System.out.println("Reading data from server...");
 					buffer.clear();
 
 					int read = 0;
-
+					SocketChannel channel = (SocketChannel)key.channel();
 					try {
 						while(buffer.hasRemaining() && read != -1) {
 							read = channel.read(buffer);
@@ -97,7 +97,7 @@ public class Client {
 						byte[] data = new byte[40];
 						System.arraycopy(buffer.array(), 0, data, 0, 40);
 						//key.interestOps(SelectionKey.OP_WRITE);
-						System.out.println("Arrived: " + HashingFunction.getInstance().SHA1FromBytes(data));
+						System.out.println("Arrived: " + new String(data));
 					} catch(Exception e) {
 						e.printStackTrace();
 					}finally {
