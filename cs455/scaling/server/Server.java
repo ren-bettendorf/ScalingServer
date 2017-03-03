@@ -89,8 +89,6 @@ public class Server {
 					this.accept(key);
 				}else if(key.isReadable()) {
 					this.read(key);
-				}else if(key.isWritable()) {
-					this.write(key);
 				}
 				}
 			}
@@ -110,14 +108,7 @@ public class Server {
 		SocketChannel channel = (SocketChannel) key.channel();
 		State state = (State) key.attachment();
 		if(!state.getReadingState()) {
-			threadPoolManager.addTask(new ReadTask(key, selector));
-		}
-	}
-
-	private void write(SelectionKey key) throws IOException {
-		State state = (State) key.attachment();
-		if(!state.getWritingState()) {
-			threadPoolManager.addTask(new WriteTask(key, selector));
+			threadPoolManager.addTask(new ReadTask(key, selector, threadPoolManager));
 		}
 	}
 }

@@ -15,11 +15,13 @@ public class ReadTask extends Task{
 	private SelectionKey key;
 	private SocketChannel channel;
 	private Selector selector;
+	private ThreadPoolManager threadPoolManager;
 
-	public ReadTask(SelectionKey key, Selector selector) {
+	public ReadTask(SelectionKey key, Selector selector, ThreadPoolManager threadPoolManager) {
 		this.key = key;
 		this.channel = (SocketChannel) key.channel();
 		this.selector = selector;
+		this.threadPoolManager = threadPoolManager;
 	}
 
 	@Override
@@ -50,7 +52,7 @@ public class ReadTask extends Task{
 			String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
 			System.out.println("Attaching: " + hashcode);
 	            	state.setData(hashcode);
-			
+			threadPoolManager.addTask(new WriteTask(key, selector));
         	} catch (IOException ioe ) {
 			ioe.printStackTrace();
 		} catch ( NoSuchAlgorithmException nsae) {

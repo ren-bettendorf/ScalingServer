@@ -64,12 +64,11 @@ public class Client {
 
 		while(true) {
 			selector.select();
-			System.out.println("SELECTING ALL THE THINGS " + selector.selectedKeys().size());
 			Iterator keys = selector.selectedKeys().iterator();
 			ByteBuffer buffer = ByteBuffer.allocate(40);
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
-				//keys.remove();
+				keys.remove();
 				synchronized(key) {
 				if(key.isConnectable()){
 					SocketChannel channel = (SocketChannel)key.channel();
@@ -80,7 +79,7 @@ public class Client {
 				}else if(key.isReadable()) {
 					System.out.println("Reading data from server...");
 					buffer.clear();
-
+					
 					int read = 0;
 					SocketChannel channel = (SocketChannel)key.channel();
 					try {

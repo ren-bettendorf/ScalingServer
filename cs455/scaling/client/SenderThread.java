@@ -26,13 +26,13 @@ public class SenderThread implements Runnable {
 	@Override
 	public void run() {
 		SocketChannel channel = (SocketChannel) key.channel();
-		//while(true) {
+		while(true) {
 			byte[] dataToBeWritten = createRandomData();
-			ByteBuffer buffer = ByteBuffer.allocate(8000);
-			buffer.flip();
+			ByteBuffer buffer = ByteBuffer.wrap(dataToBeWritten);
+			buffer.rewind();
 			synchronized(key) {
 			try {
-				channel.write(buffer.wrap(dataToBeWritten));
+				channel.write(buffer);
 			}catch(IOException ioe) {
 				ioe.printStackTrace();
 			}finally {
@@ -47,7 +47,7 @@ public class SenderThread implements Runnable {
 			} catch(Exception e) {
 				e.printStackTrace();
 			}
-		//}
+		}
 	}
 
 	private byte[] createRandomData() {
