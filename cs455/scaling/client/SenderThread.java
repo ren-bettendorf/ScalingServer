@@ -15,9 +15,12 @@ public class SenderThread implements Runnable {
 	
 	private final int messageRate;
 	private SelectionKey key;
-	public SenderThread(SelectionKey key, int messageDivisor) {
+	private Selector selector;
+
+	public SenderThread(SelectionKey key, Selector selector, int messageDivisor) {
 		this.messageRate = 1000 / messageDivisor;
 		this.key = key;
+		this.selector = selector;
 	}
 	
 	@Override
@@ -28,9 +31,13 @@ public class SenderThread implements Runnable {
 			ByteBuffer buffer = ByteBuffer.allocate(8000);
 			buffer.flip();
 			try {
-				channel.write(ByteBuffer.wrap(dataToBeWritten));
+				channel.write(buffer.wrap(dataToBeWritten));
 			}catch(IOException ioe) {
 				ioe.printStackTrace();
+			}finally {
+				System.out.println("Interested in reading...");
+				key.interestOps(SelectionKey.OP_READ);
+				selector.wakeup();
 			}
 			try {
 				Thread.sleep( messageRate );

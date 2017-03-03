@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.Selector;
 
 import cs455.scaling.util.HashingFunction;
 import cs455.scaling.util.State;
@@ -13,12 +14,12 @@ public class ReadTask extends Task{
 
 	private SelectionKey key;
 	private SocketChannel channel;
-	private ThreadPoolManager threadPoolManager;
-	
-	public ReadTask(SelectionKey key, SocketChannel channel, ThreadPoolManager threadPoolManager) {
+	private Selector selector;
+
+	public ReadTask(SelectionKey key, Selector selector) {
 		this.key = key;
-		this.channel = channel;
-		this.threadPoolManager = threadPoolManager;
+		this.channel = (SocketChannel) key.channel();
+		this.selector = selector;
 	}
 
 	@Override
@@ -44,15 +45,17 @@ public class ReadTask extends Task{
 			byte[] data = new byte[bufferSize];
 			System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
 
-			//key.interestOps(SelectionKey.OP_WRITE);
-	            	WriteTask writeTask = new WriteTask(key, channel, HashingFunction.getInstance().SHA1FromBytes(data));
-            		threadPoolManager.addTask(writeTask);
+			key.interestOps(SelectionKey.OP_WRITE);
+			String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
+			System.out.println("Attaching: " + hashcode);
+	            	state.setData(hashcode);
         	} catch (IOException ioe ) {
 			ioe.printStackTrace();
 		} catch ( NoSuchAlgorithmException nsae) {
             		nsae.printStackTrace();
         	}finally {
 			state.setReadingState(false);
+			selector.wakeup();
 		}
 	}
 }

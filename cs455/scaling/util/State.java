@@ -4,10 +4,11 @@ public class State {
 
 	private boolean readingState, writingState;
 	private final Object lock = new Object();
-
+	private String data;
 	public State() {
 		readingState = false;
 		writingState = false;
+		data = null;
 	}
 
 	public boolean getReadingState() {
@@ -19,6 +20,21 @@ public class State {
 	public boolean getWritingState() {
 		synchronized(lock) {
 			return writingState;
+		}
+	}
+
+	public String getData() {
+		String returnData;
+		synchronized(lock) {
+			returnData = data;
+			data = null;
+		}
+		return returnData;
+	}
+
+	public void setData(String data) {
+		synchronized(lock) {
+			this.data = data;
 		}
 	}
 

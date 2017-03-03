@@ -61,7 +61,7 @@ public class Client {
 		channel.configureBlocking(false);
 		channel.connect(new InetSocketAddress(serverHost, serverPort));
 		channel.register(selector, SelectionKey.OP_CONNECT);
-		ByteBuffer buffer = ByteBuffer.allocate(40);
+
 		while(true) {
 			selector.select();
 
@@ -75,11 +75,12 @@ public class Client {
 						if(channel.finishConnect()) {
 							key.interestOps(SelectionKey.OP_READ);
 							startSenderThread(key);
+							System.out.println("Starting SenderThread...");
 						}
 					}else if(key.isReadable()) {
 						System.out.println("Reading data from server...");
+						ByteBuffer buffer = ByteBuffer.allocate(40);
 						buffer.clear();
-						buffer.rewind();
 
 						int read = 0;
 
@@ -87,19 +88,21 @@ public class Client {
 							while(buffer.hasRemaining() && read != -1) {
 								read = channel.read(buffer);
 							}
-							
+
 							if(read == -1) {
 								System.out.println("Something went wrong...");
 								channel.close();
 								key.cancel();
 								return;
 							}
-							byte[] data = buffer.array();
-							//System.arraycopy(buffer.array(), 0, data, 0, 8000);
-
+							byte[] data = new byte[40];
+							System.arraycopy(buffer.array(), 0, data, 0, 40);
+							key.interestOps(SelectionKey.OP_WRITE);
 							System.out.println("Arrived: " + HashingFunction.getInstance().SHA1FromBytes(data));
 						} catch(Exception e) {
 							e.printStackTrace();
+						}finally {
+							selector.wakeup();
 						}
 					}
 				}
@@ -108,6 +111,6 @@ public class Client {
 	}
 
 	private void startSenderThread(SelectionKey key) {
-		new Thread(new SenderThread(key, messageRate)).start();
+		new Thread(new SenderThread(key, selector, messageRate)).start();
 	}
 }

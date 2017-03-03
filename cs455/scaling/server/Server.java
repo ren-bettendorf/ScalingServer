@@ -81,17 +81,18 @@ public class Server {
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
 				keys.remove();
-				
-					if(!key.isValid()) {
-						continue;
-					}
-
-					if(key.isAcceptable()) {
-						this.accept(key);
-					}else if(key.isReadable()) {
-						this.read(key);
-					}
-				
+				synchronized(key) {
+				if(!key.isValid()) {
+					continue;
+				}
+				if(key.isAcceptable()) {
+					this.accept(key);
+				}else if(key.isReadable()) {
+					this.read(key);
+				}else if(key.isWritable()) {
+					this.write(key);
+				}
+				}
 			}
 		}
 	}
@@ -109,7 +110,14 @@ public class Server {
 		SocketChannel channel = (SocketChannel) key.channel();
 		State state = (State) key.attachment();
 		if(!state.getReadingState()) {
-			threadPoolManager.addTask(new ReadTask(key, channel, threadPoolManager));
+			threadPoolManager.addTask(new ReadTask(key, selector));
+		}
+	}
+
+	private void write(SelectionKey key) throws IOException {
+		State state = (State) key.attachment();
+		if(!state.getWritingState()) {
+			threadPoolManager.addTask(new WriteTask(key, selector));
 		}
 	}
 }
