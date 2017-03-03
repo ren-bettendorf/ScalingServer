@@ -22,14 +22,15 @@ public class SenderThread implements Runnable {
 		this.key = key;
 		this.selector = selector;
 	}
-	
+
 	@Override
 	public void run() {
 		SocketChannel channel = (SocketChannel) key.channel();
-		while(true) {
+		//while(true) {
 			byte[] dataToBeWritten = createRandomData();
 			ByteBuffer buffer = ByteBuffer.allocate(8000);
 			buffer.flip();
+			synchronized(key) {
 			try {
 				channel.write(buffer.wrap(dataToBeWritten));
 			}catch(IOException ioe) {
@@ -39,14 +40,16 @@ public class SenderThread implements Runnable {
 				key.interestOps(SelectionKey.OP_READ);
 				selector.wakeup();
 			}
-			try {
-				Thread.sleep( messageRate );
-			} catch(Exception e) { 
-				e.printStackTrace(); 
 			}
-		}
+			try {
+				System.out.println("Sleeping for " + messageRate);
+				Thread.sleep( messageRate );
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		//}
 	}
-	
+
 	private byte[] createRandomData() {
 		byte[] data = new byte[8000];
 

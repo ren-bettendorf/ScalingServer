@@ -32,6 +32,7 @@ public class ReadTask extends Task{
 
 		try {
 			System.out.println("Reading data...");
+			synchronized(key) {
 			while(buffer.hasRemaining() && read != -1) {
             			read = channel.read(buffer);
 			}
@@ -49,6 +50,7 @@ public class ReadTask extends Task{
 			String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
 			System.out.println("Attaching: " + hashcode);
 	            	state.setData(hashcode);
+			}
         	} catch (IOException ioe ) {
 			ioe.printStackTrace();
 		} catch ( NoSuchAlgorithmException nsae) {

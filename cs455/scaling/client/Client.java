@@ -66,46 +66,45 @@ public class Client {
 			selector.select();
 
 			Iterator keys = selector.selectedKeys().iterator();
-
+			ByteBuffer buffer = ByteBuffer.allocate(40);
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
 				keys.remove();
 				synchronized(key) {
-					if(key.isConnectable()){
-						if(channel.finishConnect()) {
-							key.interestOps(SelectionKey.OP_READ);
-							startSenderThread(key);
-							System.out.println("Starting SenderThread...");
+				if(key.isConnectable()){
+					if(channel.finishConnect()) {
+						startSenderThread(key);
+						key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+						System.out.println("Starting SenderThread...");
+					}
+				}else if(key.isReadable()) {
+					System.out.println("Reading data from server...");
+					buffer.clear();
+
+					int read = 0;
+
+					try {
+						while(buffer.hasRemaining() && read != -1) {
+							read = channel.read(buffer);
 						}
-					}else if(key.isReadable()) {
-						System.out.println("Reading data from server...");
-						ByteBuffer buffer = ByteBuffer.allocate(40);
-						buffer.clear();
 
-						int read = 0;
-
-						try {
-							while(buffer.hasRemaining() && read != -1) {
-								read = channel.read(buffer);
-							}
-
-							if(read == -1) {
-								System.out.println("Something went wrong...");
-								channel.close();
-								key.cancel();
-								return;
-							}
-							byte[] data = new byte[40];
-							System.arraycopy(buffer.array(), 0, data, 0, 40);
-							key.interestOps(SelectionKey.OP_WRITE);
-							System.out.println("Arrived: " + HashingFunction.getInstance().SHA1FromBytes(data));
-						} catch(Exception e) {
-							e.printStackTrace();
-						}finally {
-							selector.wakeup();
+						if(read == -1) {
+							System.out.println("Something went wrong...");
+							channel.close();
+							key.cancel();
+							return;
 						}
+						byte[] data = new byte[40];
+						System.arraycopy(buffer.array(), 0, data, 0, 40);
+						//key.interestOps(SelectionKey.OP_WRITE);
+						System.out.println("Arrived: " + HashingFunction.getInstance().SHA1FromBytes(data));
+					} catch(Exception e) {
+						e.printStackTrace();
+					}finally {
+						selector.wakeup();
 					}
 				}
+}
 			}
 		}
 	}
