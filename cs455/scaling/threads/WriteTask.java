@@ -29,13 +29,10 @@ public class WriteTask extends Task{
 		state.setWritingState(true);
 		try {
 	        	System.out.println("Writing[" + data.getBytes().length + "]: " + data );
-			ByteBuffer buffer = ByteBuffer.allocate(40);
-        		buffer.flip();
-			buffer.wrap(data.getBytes());
-			
+			ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
+        		buffer.rewind();
 			channel.write(buffer);
             		key.interestOps(SelectionKey.OP_READ);
-			
         	} catch (IOException e) {
             		e.printStackTrace();
         	} finally {
