@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 import cs455.scaling.threads.*;
 import cs455.scaling.util.State;
-import cs455.scaling.util.MessageTracker;
+import cs455.scaling.util.ServerMessageTracker;
 
 public class Server {
 

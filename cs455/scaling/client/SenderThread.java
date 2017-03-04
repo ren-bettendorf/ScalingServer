@@ -11,16 +11,20 @@ import java.util.Iterator;
 import java.util.Random;
 import java.security.NoSuchAlgorithmException;
 
+import cs455.scaling.util.ClientMessageTracker;
+
 public class SenderThread implements Runnable {
 
 	private final int messageRate;
 	private SelectionKey key;
 	private Selector selector;
+	private ClientMessageTracker messageTracker;
 
-	public SenderThread(SelectionKey key, Selector selector, int messageDivisor) {
+	public SenderThread(SelectionKey key, Selector selector, int messageDivisor, ClientMessageTracker messageTracker) {
 		this.messageRate = 1000 / messageDivisor;
 		this.key = key;
 		this.selector = selector;
+		this.messageTracker = messageTracker;
 	}
 
 	@Override
@@ -39,6 +43,7 @@ public class SenderThread implements Runnable {
 				System.out.println("Interested in reading...");
 				key.interestOps(SelectionKey.OP_READ);
 				selector.wakeup();
+				messageTracker.incrementMessagesSent();
 			}
 			}
 			try {

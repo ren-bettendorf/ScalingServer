@@ -11,16 +11,19 @@ import java.util.Iterator;
 import java.util.Random;
 
 import cs455.scaling.util.HashingFunction;
+import cs455.scaling.util.ClientMessageTracker;
 
 public class Client {
 	private LinkedList<String> hashcodes;
 	private Selector selector;
 	private final int bufferSize = 8000;
 	private final int messageRate;
+	private ClientMessageTracker messageTracker;
 
 	public Client(String serverHost, int port, int messageRate) throws IOException {
 		this.hashcodes = new LinkedList<String>();
 		this.messageRate = messageRate;
+		this.messageTracker = new ClientMessageTracker();
 		startClient(serverHost, port);
 	}
 
@@ -73,13 +76,14 @@ public class Client {
 				if(key.isConnectable()){
 					SocketChannel channel = (SocketChannel)key.channel();
 					channel.finishConnect();
+					startMessageTrackerThread();
 					startSenderThread(key);
 					key.interestOps(SelectionKey.OP_READ);
 					System.out.println("Starting SenderThread...");
 				}else if(key.isReadable()) {
 					System.out.println("Reading data from server...");
 					buffer.clear();
-					
+
 					int read = 0;
 					SocketChannel channel = (SocketChannel)key.channel();
 					try {
@@ -95,7 +99,7 @@ public class Client {
 						}
 						byte[] data = new byte[40];
 						System.arraycopy(buffer.array(), 0, data, 0, 40);
-						//key.interestOps(SelectionKey.OP_WRITE);
+						messageTracker.incrementMessagesReceived();
 						System.out.println("Arrived: " + new String(data));
 					} catch(Exception e) {
 						e.printStackTrace();
@@ -108,7 +112,11 @@ public class Client {
 		}
 	}
 
+	private void startMessageTrackerThread() {
+		new Thread(messageTracker).start();
+	}
+
 	private void startSenderThread(SelectionKey key) {
-		new Thread(new SenderThread(key, selector, messageRate)).start();
+		new Thread(new SenderThread(key, selector, messageRate, messageTracker)).start();
 	}
 }

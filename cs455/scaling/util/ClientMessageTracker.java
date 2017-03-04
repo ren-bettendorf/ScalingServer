@@ -3,21 +3,22 @@ package cs455.scaling.util;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class MessageTracker implements Runnable {
+public class ClientMessageTracker implements Runnable {
 
 	// Will use to message every 10seconds
 	private final int messageRate;
 	private int messageSent, messageReceived;
 	private final Object lock = new Object();
 	private final DateTimeFormatter formatter;
-	public MessageTracker(int messageTime) {
+	
+	public ClientMessageTracker() {
 		this.messageSent = 0;
 		this.messageReceived = 0;
-		this.messageRate = messageTime;
+		this.messageRate = 10;
 		formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
 	}
 
-	public void incrementMessageSent() {
+	public void incrementMessagesSent() {
 		synchronized(lock) {
 			messageSent++;
 		}
