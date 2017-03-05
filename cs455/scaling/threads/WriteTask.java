@@ -7,17 +7,20 @@ import java.nio.channels.Selector;
 import java.nio.ByteBuffer;
 
 import cs455.scaling.util.State;
+import cs455.scaling.util.ServerMessageTracker;
 
 public class WriteTask extends Task{
 
 	private SelectionKey key;
 	private SocketChannel channel;
 	private Selector selector;
+	private ServerMessageTracker messageTracker;
 
-	public WriteTask(SelectionKey key, Selector selector) {
+	public WriteTask(SelectionKey key, Selector selector, ServerMessageTracker messageTracker) {
 		this.key = key;
 		this.channel = (SocketChannel)key.channel();
 		this.selector = selector;
+		this.messageTracker = messageTracker;
 	}
 
 	@Override
@@ -36,8 +39,9 @@ public class WriteTask extends Task{
         		buffer.rewind();
 			synchronized(key) {
 				channel.write(buffer);
-            		key.interestOps(SelectionKey.OP_READ);
-				}
+            			key.interestOps(SelectionKey.OP_READ);
+			}
+			messageTracker.incrementMessageThroughput();
         	} catch (IOException e) {
             		e.printStackTrace();
         	} finally {

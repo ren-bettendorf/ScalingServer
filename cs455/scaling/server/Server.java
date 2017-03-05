@@ -20,6 +20,7 @@ public class Server {
 	private Selector selector;
 	private ThreadPoolManager threadPoolManager;
 	private ServerSocketChannel serverSocketChannel;
+	private ServerMessageTracker messageTracker;
 
 	public Server(int port, int numberThreads) throws IOException{
 		this.port = port;
@@ -33,6 +34,7 @@ public class Server {
 		this.hostAddress = tempHost;
 		this.threadPoolManager = new ThreadPoolManager();
 		this.threadPoolManager.initializeThreadPool(numberThreads);
+		this.messageTracker = new ServerMessageTracker();
 
 		startServer();
 	}
@@ -66,13 +68,14 @@ public class Server {
 		}
 	}
 
-	public void startServer() throws IOException {
+	private void startServer() throws IOException {
 		this.selector = Selector.open();
 
 		this.serverSocketChannel = ServerSocketChannel.open();
 		serverSocketChannel.configureBlocking(false);
 		serverSocketChannel.socket().bind(new InetSocketAddress(hostAddress, port));
 		serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
+		new Thread(messageTracker).start();
 
 		while(true) {
 			this.selector.select();
@@ -103,13 +106,14 @@ public class Server {
 		channel.configureBlocking(false);
 		channel.register(selector, SelectionKey.OP_READ, new State());
 		System.out.println("Connected: " + channel.socket().getRemoteSocketAddress().toString());
+		messageTracker.incrementActiveConnections();
 	}
 
 	private void read(SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel) key.channel();
 		State state = (State) key.attachment();
 		if(!state.getReadingState()) {
-			threadPoolManager.addTask(new ReadTask(key, selector, threadPoolManager));
+			threadPoolManager.addTask(new ReadTask(key, selector, threadPoolManager, messageTracker));
 		}
 	}
 }

@@ -9,6 +9,7 @@ import java.nio.channels.Selector;
 
 import cs455.scaling.util.HashingFunction;
 import cs455.scaling.util.State;
+import cs455.scaling.util.ServerMessageTracker;
 
 public class ReadTask extends Task{
 
@@ -16,12 +17,14 @@ public class ReadTask extends Task{
 	private SocketChannel channel;
 	private Selector selector;
 	private ThreadPoolManager threadPoolManager;
+	private ServerMessageTracker messageTracker;
 
-	public ReadTask(SelectionKey key, Selector selector, ThreadPoolManager threadPoolManager) {
+	public ReadTask(SelectionKey key, Selector selector, ThreadPoolManager threadPoolManager, ServerMessageTracker messageTracker) {
 		this.key = key;
 		this.channel = (SocketChannel) key.channel();
 		this.selector = selector;
 		this.threadPoolManager = threadPoolManager;
+		this.messageTracker = messageTracker;
 	}
 
 	@Override
@@ -43,16 +46,17 @@ public class ReadTask extends Task{
                 		System.out.println("Connection closed by client: " + channel.socket().getRemoteSocketAddress());
                 		channel.close();
                 		key.cancel();
+				messageTracker.decrementActiveConnections();
                 		return;
             		}
 			byte[] data = new byte[bufferSize];
 			System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
-
+			messageTracker.incrementMessageThroughput();
 			key.interestOps(SelectionKey.OP_WRITE);
 			String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
 			System.out.println("Attaching: " + hashcode);
 	            	state.setData(hashcode);
-			threadPoolManager.addTask(new WriteTask(key, selector));
+			threadPoolManager.addTask(new WriteTask(key, selector, messageTracker));
         	} catch (IOException ioe ) {
 			ioe.printStackTrace();
 		} catch ( NoSuchAlgorithmException nsae) {
