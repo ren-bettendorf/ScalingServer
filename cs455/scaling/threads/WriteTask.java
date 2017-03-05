@@ -35,9 +35,9 @@ public class WriteTask extends Task{
 			ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
         		buffer.rewind();
 			synchronized(key) {
-			channel.write(buffer);
+				channel.write(buffer);
             		key.interestOps(SelectionKey.OP_READ);
-			}
+				}
         	} catch (IOException e) {
             		e.printStackTrace();
         	} finally {
