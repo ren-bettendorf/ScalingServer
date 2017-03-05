@@ -12,6 +12,7 @@ import java.util.Random;
 import java.security.NoSuchAlgorithmException;
 
 import cs455.scaling.util.ClientMessageTracker;
+import cs455.scaling.util.HashingFunction;
 
 public class SenderThread implements Runnable {
 
@@ -35,17 +36,23 @@ public class SenderThread implements Runnable {
 			ByteBuffer buffer = ByteBuffer.wrap(dataToBeWritten);
 			buffer.rewind();
 			synchronized(key) {
+				try {
+					channel.write(buffer);
+				}catch(IOException ioe) {
+					ioe.printStackTrace();
+				}finally {
+					System.out.println("Interested in reading...");
+					key.interestOps(SelectionKey.OP_READ);
+					selector.wakeup();
+				}
+			}
+			messageTracker.incrementMessagesSent();
 			try {
-				channel.write(buffer);
-			}catch(IOException ioe) {
-				ioe.printStackTrace();
-			}finally {
-				System.out.println("Interested in reading...");
-				key.interestOps(SelectionKey.OP_READ);
-				selector.wakeup();
-				messageTracker.incrementMessagesSent();
+				messageTracker.addHashcode(HashingFunction.getInstance().SHA1FromBytes(dataToBeWritten));
+			} catch(NoSuchAlgorithmException nsae) {
+				nsae.printStackTrace();
 			}
-			}
+
 			try {
 				System.out.println("Sleeping for " + messageRate);
 				Thread.sleep( messageRate );

@@ -1,5 +1,7 @@
 package cs455.scaling.util;
 
+import java.util.List;
+import java.util.LinkedList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -10,11 +12,29 @@ public class ClientMessageTracker implements Runnable {
 	private int messageSent, messageReceived;
 	private final Object lock = new Object();
 	private final DateTimeFormatter formatter;
+	private List<String> hashcodes;
 
 	public ClientMessageTracker() {
+		this.hashcodes = new LinkedList<String>();
 		this.messageSent = 0;
 		this.messageReceived = 0;
 		formatter = DateTimeFormatter.ofPattern("MM/dd/yy HH:mm:ss");
+	}
+
+	public void addHashcode(String hashcode) {
+		synchronized(hashcodes) {
+			hashcodes.add(hashcode);
+		}
+	}
+
+	public boolean removeHashcode(String hashcode) {
+		synchronized(hashcodes) {
+			if(hashcodes.contains(hashcode)) {
+				hashcodes.remove(hashcode);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public void incrementMessagesSent() {
