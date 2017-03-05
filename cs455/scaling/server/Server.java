@@ -106,7 +106,7 @@ public class Server {
 		channel.configureBlocking(false);
 		channel.register(selector, SelectionKey.OP_READ, new State());
 		System.out.println("Connected: " + channel.socket().getRemoteSocketAddress().toString());
-		messageTracker.incrementActiveConnections();
+		messageTracker.incrementActiveConnections(channel.socket().getRemoteSocketAddress().toString());
 	}
 
 	private void read(SelectionKey key) throws IOException {

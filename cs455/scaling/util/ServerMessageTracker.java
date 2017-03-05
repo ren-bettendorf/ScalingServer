@@ -1,18 +1,22 @@
 package cs455.scaling.util;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.nio.channels.SelectionKey;
 
 public class ServerMessageTracker implements Runnable {
 	// Will use to message every 5 seconds
 	private final int messageRate = 5;
-	private int messageThroughput, activeConnections;
+	private int messageThroughput;
 	private final Object lock = new Object();
 	private final DateTimeFormatter formatter;
+	private List<String> activeConnections;
 
 	public ServerMessageTracker() {
 		this.messageThroughput = 0;
-		this.activeConnections = 0;
+		this.activeConnections = new ArrayList<String>();
 		formatter = DateTimeFormatter.ofPattern("MM/dd/yy HH:mm:ss");
 	}
 
@@ -22,15 +26,19 @@ public class ServerMessageTracker implements Runnable {
 		}
 	}
 
-	public void incrementActiveConnections() {
+	public void incrementActiveConnections(String connection) {
 		synchronized(lock) {
-			activeConnections++;
+			if(!activeConnections.contains(connection)) {
+				activeConnections.add(connection);
+			}
 		}
 	}
 
-	public void decrementActiveConnections() {
+	public void decrementActiveConnections(String connection) {
 		synchronized(lock) {
-			activeConnections--;
+			if(activeConnections.contains(connection)) {
+				activeConnections.remove(connection);
+			}
 		}
 	}
 
@@ -42,7 +50,7 @@ public class ServerMessageTracker implements Runnable {
 			if(current.isAfter(messageTime)) {
 				messageTime = current.plusSeconds(messageRate);
 				synchronized(lock) {
-					System.out.println("[" + messageTime.format(formatter) + "] Total Sent Count: " + messageThroughput + ", Active Clients: " + activeConnections );
+					System.out.println("[" + messageTime.format(formatter) + "] Current Server Throughput: " + messageThroughput + " message/5seconds, Active Clients: " + activeConnections.size() );
 					messageThroughput = 0;
 				}
 			}

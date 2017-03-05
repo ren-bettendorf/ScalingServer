@@ -44,9 +44,9 @@ public class ReadTask extends Task{
 
             		if (read == -1) {
                 		System.out.println("Connection closed by client: " + channel.socket().getRemoteSocketAddress());
+				messageTracker.decrementActiveConnections(channel.socket().getRemoteSocketAddress().toString());
                 		channel.close();
                 		key.cancel();
-				messageTracker.decrementActiveConnections();
                 		return;
             		}
 			byte[] data = new byte[bufferSize];
