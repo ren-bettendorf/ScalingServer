@@ -33,6 +33,12 @@ public class SenderThread implements Runnable {
 		SocketChannel channel = (SocketChannel) key.channel();
 		while(true) {
 			byte[] dataToBeWritten = createRandomData();
+			messageTracker.incrementMessagesSent();
+			try {
+				messageTracker.addHashcode(HashingFunction.getInstance().SHA1FromBytes(dataToBeWritten));
+			} catch(NoSuchAlgorithmException nsae) {
+				nsae.printStackTrace();
+			}
 			ByteBuffer buffer = ByteBuffer.wrap(dataToBeWritten);
 			buffer.rewind();
 			synchronized(key) {
@@ -46,12 +52,7 @@ public class SenderThread implements Runnable {
 					selector.wakeup();
 				}
 			}
-			messageTracker.incrementMessagesSent();
-			try {
-				messageTracker.addHashcode(HashingFunction.getInstance().SHA1FromBytes(dataToBeWritten));
-			} catch(NoSuchAlgorithmException nsae) {
-				nsae.printStackTrace();
-			}
+			
 
 			try {
 				System.out.println("Sleeping for " + messageRate);
