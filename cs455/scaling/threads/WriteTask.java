@@ -24,15 +24,20 @@ public class WriteTask extends Task{
 	public void startTask() {
 		State state = (State)key.attachment();
 		String data = state.getData();
-		if(data == null) { return; }
+		if(data == null) {
+			System.out.println("Data is null");
+			return;
+		}
 
 		state.setWritingState(true);
 		try {
 	        	System.out.println("Writing[" + data.getBytes().length + "]: " + data );
 			ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
         		buffer.rewind();
+			synchronized(key) {
 			channel.write(buffer);
             		key.interestOps(SelectionKey.OP_READ);
+			}
         	} catch (IOException e) {
             		e.printStackTrace();
         	} finally {

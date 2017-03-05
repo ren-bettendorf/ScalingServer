@@ -9,13 +9,13 @@ public class Worker implements Runnable {
 
 	public Worker(ThreadPool pool) {
 		this.pool = pool;
+		this.currentTask = null;
 	}
 	
 	public void addTask(Task task) {
 		if(task != null) {
 			synchronized(lock){
 				this.currentTask = task;
-				taskStatus = true;
 			}
 		}
 	}
@@ -24,11 +24,9 @@ public class Worker implements Runnable {
 	public void run() {
 		while(true) {
 			synchronized(lock) {
-				if(taskStatus) {
+				if(currentTask != null) {
 					currentTask.startTask();
-					
-					taskStatus = false;
-					pool.addBackToPool(this);
+					currentTask = pool.addBackToPool(this);
 				}
 			}
 		}

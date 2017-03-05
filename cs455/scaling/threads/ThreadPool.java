@@ -26,18 +26,20 @@ public class ThreadPool {
 		}
 	}
 
-	public void addBackToPool(Worker worker) {
+	public Task addBackToPool(Worker worker) {
+		Task task = null;
 		synchronized(threadPool) {
 			if(!threadPool.contains(worker)) {
 				if(!manager.checkForMoreTasks()) {
 					System.out.println("Adding task to worker");
-					worker.addTask(manager.removeTask());
+					task = manager.removeTask();
 				} else {
 					System.out.println("No more tasks adding back to pool");
 					threadPool.add(worker);
 				}
 			}
 		}
+		return task;
 	}
 	
 	public void giveWorkerTask(Task task) {

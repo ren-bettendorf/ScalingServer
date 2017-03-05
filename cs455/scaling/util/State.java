@@ -24,7 +24,7 @@ public class State {
 	}
 
 	public String getData() {
-		String returnData;
+		String returnData = null;;
 		synchronized(lock) {
 			returnData = data;
 			data = null;
