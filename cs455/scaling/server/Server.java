@@ -20,7 +20,7 @@ public class Server {
 	private Selector selector;
 	private ThreadPoolManager threadPoolManager;
 	private ServerSocketChannel serverSocketChannel;
-	
+
 	public Server(int port, int numberThreads) throws IOException{
 		this.port = port;
 		this.numberThreads = numberThreads;
@@ -33,7 +33,7 @@ public class Server {
 		this.hostAddress = tempHost;
 		this.threadPoolManager = new ThreadPoolManager();
 		this.threadPoolManager.initializeThreadPool(numberThreads);
-		
+
 		startServer();
 	}
 
@@ -68,12 +68,12 @@ public class Server {
 
 	public void startServer() throws IOException {
 		this.selector = Selector.open();
-		
+
 		this.serverSocketChannel = ServerSocketChannel.open();
 		serverSocketChannel.configureBlocking(false);
 		serverSocketChannel.socket().bind(new InetSocketAddress(hostAddress, port));
 		serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
-		
+
 		while(true) {
 			this.selector.select();
 
@@ -82,7 +82,7 @@ public class Server {
 			while(keys.hasNext()) {
 				SelectionKey key = (SelectionKey) keys.next();
 				keys.remove();
-				synchronized(key) {
+
 				if(!key.isValid()) {
 					continue;
 				}
@@ -90,7 +90,6 @@ public class Server {
 					this.accept(key);
 				}else if(key.isReadable()) {
 					this.read(key);
-				}
 				}
 			}
 		}
@@ -103,6 +102,7 @@ public class Server {
 		System.out.println("Accepting incoming connection..");
 		channel.configureBlocking(false);
 		channel.register(selector, SelectionKey.OP_READ, new State());
+		System.out.println("Connected: " + channel.socket().getRemoteSocketAddress().toString());
 	}
 
 	private void read(SelectionKey key) throws IOException {

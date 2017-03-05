@@ -34,8 +34,6 @@ public class ClientMessageTracker implements Runnable {
 				return true;
 			}
 		}
-		System.out.println("Missing[" + hashcode.length + "]: " + hashcode);
-		System.exit(0);
 		return false;
 	}
 

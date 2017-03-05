@@ -35,7 +35,9 @@ public class SenderThread implements Runnable {
 			byte[] dataToBeWritten = createRandomData();
 			messageTracker.incrementMessagesSent();
 			try {
-				messageTracker.addHashcode(HashingFunction.getInstance().SHA1FromBytes(dataToBeWritten));
+				String data = HashingFunction.getInstance().SHA1FromBytes(dataToBeWritten);
+				messageTracker.addHashcode(data);
+				System.out.println("Attaching: " + data);
 			} catch(NoSuchAlgorithmException nsae) {
 				nsae.printStackTrace();
 			}
@@ -47,7 +49,7 @@ public class SenderThread implements Runnable {
 				}catch(IOException ioe) {
 					ioe.printStackTrace();
 				}finally {
-					System.out.println("Interested in reading...");
+					//System.out.println("Interested in reading...");
 					key.interestOps(SelectionKey.OP_READ);
 					selector.wakeup();
 				}
@@ -55,7 +57,7 @@ public class SenderThread implements Runnable {
 			
 
 			try {
-				System.out.println("Sleeping for " + messageRate);
+				//System.out.println("Sleeping for " + messageRate);
 				Thread.sleep( messageRate );
 			} catch(Exception e) {
 				e.printStackTrace();

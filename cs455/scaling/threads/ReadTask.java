@@ -34,7 +34,7 @@ public class ReadTask extends Task{
 
 		try {
 			System.out.println("Reading data...");
-			
+
 			while(buffer.hasRemaining() && read != -1) {
             			read = channel.read(buffer);
 			}
