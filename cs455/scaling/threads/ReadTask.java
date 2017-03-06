@@ -55,8 +55,8 @@ public class ReadTask extends Task{
 			key.interestOps(SelectionKey.OP_WRITE);
 			String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
 			System.out.println("Attaching: " + hashcode);
-	            	state.setData(hashcode);
-			threadPoolManager.addTask(new WriteTask(key, selector, messageTracker));
+	            	//state.setData(hashcode);
+			threadPoolManager.addTask(new WriteTask(key, selector, hashcode, messageTracker));
         	} catch (IOException ioe ) {
 			ioe.printStackTrace();
 		} catch ( NoSuchAlgorithmException nsae) {

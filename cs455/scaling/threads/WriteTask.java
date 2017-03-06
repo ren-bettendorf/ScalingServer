@@ -15,22 +15,24 @@ public class WriteTask extends Task{
 	private SocketChannel channel;
 	private Selector selector;
 	private ServerMessageTracker messageTracker;
+	private String data;
 
-	public WriteTask(SelectionKey key, Selector selector, ServerMessageTracker messageTracker) {
+	public WriteTask(SelectionKey key, Selector selector, String data, ServerMessageTracker messageTracker) {
 		this.key = key;
 		this.channel = (SocketChannel)key.channel();
 		this.selector = selector;
 		this.messageTracker = messageTracker;
+		this.data = data;
 	}
 
 	@Override
 	public void startTask() {
 		State state = (State)key.attachment();
-		String data = state.getData();
+		/*String data = state.getData();
 		if(data == null) {
 			System.out.println("Data is null");
 			return;
-		}
+		}*/
 
 		state.setWritingState(true);
 		try {
