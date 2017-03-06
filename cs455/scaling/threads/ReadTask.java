@@ -36,7 +36,6 @@ public class ReadTask extends Task{
 		buffer.clear();
 
 		try {
-			System.out.println("Reading data...");
 
 			while(buffer.hasRemaining() && read != -1) {
             			read = channel.read(buffer);
@@ -51,6 +50,7 @@ public class ReadTask extends Task{
             		}
 			byte[] data = new byte[bufferSize];
 			System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
+			System.out.println("READING: Data Size: "+ data.length);
 			messageTracker.incrementMessageThroughput();
 			key.interestOps(SelectionKey.OP_WRITE);
 			String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
