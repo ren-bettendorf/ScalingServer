@@ -20,14 +20,14 @@ How it works:
 - If you close a window/tab, associated java process will automatically gets killed.
 COMMENT
 
-CLASSES=<project_root_directory>
+CLASSES=ScalingServer
 SCRIPT="cd $CLASSES;
-java -cp . cs455.scaling.client.Client [server-host] [server-listening-port]"
+java -cp . cs455.scaling.client.Client madison.cs.colostate.edu 2000 4"
 
 #$1 is the command-line argument
 for ((j=1; j<=$1; j++));
 do
-	COMMAND='gnome-terminal'
+	COMMAND='bash'
 	for i in `cat machine_list`
 	do
 		echo 'logging into '$i
