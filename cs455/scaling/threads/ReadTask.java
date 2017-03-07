@@ -49,10 +49,12 @@ public class ReadTask extends Task{
                 		return;
             		}
 			byte[] data = new byte[bufferSize];
-			System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
-			System.out.println("READING: Data Size: "+ data.length);
-			messageTracker.incrementMessageThroughput();
-			key.interestOps(SelectionKey.OP_WRITE);
+			synchronized(key) {
+				System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
+				System.out.println("READING: Data Size: "+ data.length);
+				messageTracker.incrementMessageThroughput();
+				key.interestOps(SelectionKey.OP_WRITE);
+			}
 			String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
 			System.out.println("Attaching: " + hashcode);
 	            	//state.setData(hashcode);
