@@ -23,7 +23,7 @@ COMMENT
 
 CLASSES=ScalingServer
 SCRIPT="cd $CLASSES;
-java -cp . cs455.scaling.client.Client [server-host] [server-listening-port] > "
+java cs455.scaling.client.Client 129.82.44.156 2000 4"
 
 #$1 is the command-line argument
 for ((j=1; j<=$1; j++));
@@ -33,7 +33,7 @@ do
 		echo 'logging into '$i
 		FOLDER="/tmp/$USER/cs455/HW2-PC"
 		FILE="$FOLDER/$j"
-		ssh $i "mkdir -p $FOLDER;touch $FILE;$SCRIPT$FILE &"
+		ssh $i "mkdir -p $FOLDER;touch $FILE;$SCRIPT &"
 	done
 	eval $COMMAND &
 done

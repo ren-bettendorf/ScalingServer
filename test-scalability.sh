@@ -22,12 +22,12 @@ COMMENT
 
 CLASSES=ScalingServer
 SCRIPT="cd $CLASSES;
-java -cp . cs455.scaling.client.Client madison.cs.colostate.edu 2000 4"
+java -cp . cs455.scaling.client.Client 129.82.44.156 2000 4"
 
 #$1 is the command-line argument
 for ((j=1; j<=$1; j++));
 do
-	COMMAND='bash'
+	COMMAND='gnome-terminal'
 	for i in `cat machine_list`
 	do
 		echo 'logging into '$i
