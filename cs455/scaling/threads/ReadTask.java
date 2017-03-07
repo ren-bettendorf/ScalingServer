@@ -34,38 +34,39 @@ public class ReadTask extends Task{
 		ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 		int read = 0;
 		buffer.clear();
+		synchronized(key) {
+			try {
 
-		try {
+				while(buffer.hasRemaining() && read != -1) {
+            				read = channel.read(buffer);
+				}
 
-			while(buffer.hasRemaining() && read != -1) {
-            			read = channel.read(buffer);
-			}
+            			if (read == -1) {
+                			System.out.println("Connection closed by client: " + channel.socket().getRemoteSocketAddress());
+					messageTracker.decrementActiveConnections(channel.socket().getRemoteSocketAddress().toString());
+                			channel.close();
+                			key.cancel();
+                			return;
+            			}
+				byte[] data = new byte[bufferSize];
 
-            		if (read == -1) {
-                		System.out.println("Connection closed by client: " + channel.socket().getRemoteSocketAddress());
-				messageTracker.decrementActiveConnections(channel.socket().getRemoteSocketAddress().toString());
-                		channel.close();
-                		key.cancel();
-                		return;
-            		}
-			byte[] data = new byte[bufferSize];
-			synchronized(key) {
 				System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
 				System.out.println("READING: Data Size: "+ data.length);
 				messageTracker.incrementMessageThroughput();
 				key.interestOps(SelectionKey.OP_WRITE);
+
+				String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
+				System.out.println("Attaching: " + hashcode);
+	            		//state.setData(hashcode);
+				threadPoolManager.addTask(new WriteTask(key, selector, hashcode, messageTracker));
+        		} catch (IOException ioe ) {
+				ioe.printStackTrace();
+			} catch ( NoSuchAlgorithmException nsae) {
+            			nsae.printStackTrace();
+        		}finally {
+				state.setReadingState(false);
+				selector.wakeup();
 			}
-			String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
-			System.out.println("Attaching: " + hashcode);
-	            	//state.setData(hashcode);
-			threadPoolManager.addTask(new WriteTask(key, selector, hashcode, messageTracker));
-        	} catch (IOException ioe ) {
-			ioe.printStackTrace();
-		} catch ( NoSuchAlgorithmException nsae) {
-            		nsae.printStackTrace();
-        	}finally {
-			state.setReadingState(false);
-			selector.wakeup();
 		}
 	}
 }
