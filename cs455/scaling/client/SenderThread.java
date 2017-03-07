@@ -43,7 +43,7 @@ public class SenderThread implements Runnable {
 			}
 			ByteBuffer buffer = ByteBuffer.wrap(dataToBeWritten);
 			buffer.rewind();
-			synchronized(key) {
+			//synchronized(key) {
 				try {
 					channel.write(buffer);
 				}catch(IOException ioe) {
@@ -53,7 +53,7 @@ public class SenderThread implements Runnable {
 					key.interestOps(SelectionKey.OP_READ);
 					selector.wakeup();
 				}
-			}
+			//}
 			
 
 			try {

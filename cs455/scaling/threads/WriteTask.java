@@ -39,10 +39,10 @@ public class WriteTask extends Task{
 	        	System.out.println("Writing[" + data.getBytes().length + "]: " + data );
 			ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
         		buffer.rewind();
-			synchronized(key) {
+			//synchronized(key) {
 				channel.write(buffer);
             			key.interestOps(SelectionKey.OP_READ);
-			}
+			//}
 			messageTracker.incrementMessageThroughput();
         	} catch (IOException e) {
             		e.printStackTrace();

@@ -34,7 +34,7 @@ public class ReadTask extends Task{
 		ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 		int read = 0;
 		buffer.clear();
-		synchronized(key) {
+
 			try {
 
 				while(buffer.hasRemaining() && read != -1) {
@@ -49,12 +49,12 @@ public class ReadTask extends Task{
                 			return;
             			}
 				byte[] data = new byte[bufferSize];
-
+			//synchronized(key) {
 				System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
 				System.out.println("READING: Data Size: "+ data.length);
 				messageTracker.incrementMessageThroughput();
 				key.interestOps(SelectionKey.OP_WRITE);
-
+			//}
 				String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
 				System.out.println("Attaching: " + hashcode);
 	            		//state.setData(hashcode);
@@ -67,6 +67,5 @@ public class ReadTask extends Task{
 				state.setReadingState(false);
 				selector.wakeup();
 			}
-		}
 	}
 }

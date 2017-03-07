@@ -50,7 +50,7 @@ public class ServerMessageTracker implements Runnable {
 			if(current.isAfter(messageTime)) {
 				messageTime = current.plusSeconds(messageRate);
 				synchronized(lock) {
-					System.out.println("[" + messageTime.format(formatter) + "] Current Server Throughput: " + messageThroughput + " message/5seconds, Active Clients: " + activeConnections.size() );
+					System.out.println("[" + messageTime.format(formatter) + "] Current Server Throughput: " + Math.floor(messageThroughput/5.0) + " message/s, Active Clients: " + activeConnections.size() );
 					messageThroughput = 0;
 				}
 			}
