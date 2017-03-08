@@ -1,42 +1,49 @@
 List of the files used:
 
-cs455.overlay.dijkstra.Edge: Creates an Edge between two vertices and sets the weight.
-cs455.overlay.dijkstra.Vertex: Creates a Vertex for a MessagingNode with a maximum connections allowed.
-cs455.overlay.dijkstra.Graph: Creates the Graph containing the Edges and Vertices. Allows searching for edge weights.
-cs455.overlay.dijkstra.ShortestPath: Finds the Shortest Path using Dijkstra's Algorithm for every Vertex in a Graph and computes Path Distance also.
+cs455.scaling.client.Client: Client deals with parsing server messages and sending 8kb data to server.
+cs455.scaling.client.SenderThread: Sends data to server at a specified message rate.
 
-cs455.overlay.node.Node: Base class for MessagingNode and Registry
-cs455.overlay.node.MessagingNode: MessagingNode deals with running rounds while collecting data and sending the data to the registry. Registers/Deregisters with the Registry.
-cs455.overlay.node.Registry: Registry responsible for building overlay, sending information relative to the graph to the MessagingNodes, starting tasks, and collecting/displaying summary of tasks.
+cs455.scaling.server.Sserver: Server deals with parsing client messages and sending hashcodes back to clients.
 
-cs455.overlay.transport.TCPServerThread: Server thread for handling new connections.
-cs455.overlay.transport.TCPReceiverThread: Receiver thread for connections already established and handling events.
-cs455.overlay.transport.TCPSender: Sends marshalled data between Nodes.
+cs455.scaling.util.ClientMessageTracker: Tracks messages sent and received along with polls data every 10 seconds.
+cs455.scaling.util.ServerMessageTracker: Tracks throughput of messages, tracks active connections, and polls data every 5 seconds.
+cs455.scaling.util.HashingFunction: Singleton that creates a SHA-1 hash from a byte array of data.
 
-cs455.overlay.wireformats.Event: Base Class for rest of Events.
-cs455.overlay.wireformats.EventFactory: Singleton class that creates different events based on events being received.
-cs455.overlay.wireformats.Protocols: Class that contains all the protocol types.
-cs455.overlay.wireformats.DeregisterRequest: Class that contains all the information required for a deregistration request.
-cs455.overlay.wireformats.DeregisterResponse: Class that contains all the information required for a deregistration response.
-cs455.overlay.wireformats.LinkWeights: Class that contains all the information required for setting up edges for the graph.
-cs455.overlay.wireformats.MessagingNodesList: Class that contains all the information required for setting up MessagingNode connections.
-cs455.overlay.wireformats.RegistrationRequest: Class that contains all the information required for a registration request.
-cs455.overlay.wireformats.RegistrationResponse: Class that contains all the information required for a registration response.
-cs455.overlay.wireformats.RelayConnection: Class that contains all the information required for setting up a relay connection.
-cs455.overlay.wireformats.RelayMessage: Class that contains all the information required for relaying a message between nodes.
-cs455.overlay.wireformats.TaskComplete: Class that contains all the information required for a MessagingNode to let the Registry know it has completed the task.
-cs455.overlay.wireformats.TaskInitiate: Class that contains all the information required for a Registry to let a MessagingNode start a task.
-cs455.overlay.wireformats.TaskSummaryRequest: Class that contains all the information required for a Registry to ask a MessagingNode for a summary of a task.
-cs455.overlay.wireformats.TaskSummaryResponse: Class that contains all the information required for a MessagingNode to send summary to Registry.
+cs455.scaling.threads.Task: Abstract class that all tasks extend.
+cs455.scaling.threads.DummyTask: Task that waits a random time up to 10 seconds for testing ThreadPoolManager.
+cs455.scaling.threads.ReadTask: Task that reads 8kb data from a ByteBuffer on a SocketChannel and creates a WriteTask for ThreadPoolManager.
+cs455.scaling.threads.WriteTask: Task that writes a string to the client from the server.
+cs455.scaling.threads.TestThreadPool: Class that tests the ThreadPool implementation.
+cs455.scaling.threads.ThreadPool: Class that manages adding and removing Worker threads from ThreadPool.
+cs455.scaling.threads.ThreadPoolManager: Class that maintains Tasks as a FIFO and ThreadPool adding/removing Worker threads.
+cs455.scaling.threads.Worker: Class that runs tasks and runs as a thread.
 
 ------------
 
 Other important information:
 
-I felt the information was not as clear as I would have liked it about exiting the program so I implemented it such that a MessagingNode exits only if it deregisters and Registry never exits
-so if you are hoping to exit the programs then you must force close the process. The Setup-Overlay is implemented so that it can take a size 1 < size < |nodes| so if 10 nodes are connected 
-setup-overlay (2<=9) will be accepted. Running the registry is as simple as "java cs455.overlay.node.Registry port-number" and MessagingNode (With Registry running) 
-"java cs455.overlay.node.MessagingNode registry-address registry-port'
+Starting the server is done by: java cs455.scaling.server.Server [Port-Number] [Number-of-Threads]
+Staritng the client is done by: java cs455.scaling.client.Client [Server-IP] [Server-Port] [Message-Rate]
+
+While testing I used below test-scalability-online.sh where the IP used is madison.cs.colostate.edu on port 2000. I did run into a problem where my machine wouldn't ssh into certain servers
+I was stuck running around 95 active Clients but it was hitting the throughput so I would imagine another 5 at that point wouldn't be too much of a slowdown.
+
+CLASSES=ScalingServer
+SCRIPT="cd $CLASSES;
+java -cp . cs455.scaling.client.Client 129.82.44.156 2000 4 > "
+
+#$1 is the command-line argument
+for ((j=1; j<=$1; j++));
+do
+	for i in `cat machine_list`
+	do
+		echo 'logging into '$i
+		FOLDER="/tmp/$USER/cs455/HW2-PC"
+		FILE="$FOLDER/$j"
+		ssh $i "mkdir -p $FOLDER;touch $FILE;$SCRIPT$FILE &"
+	done
+	eval $COMMAND &
+done
 
 
 If you have any questions you can reach me via phone at (707) 599-1696 or email at renaldorini@gmail.com
