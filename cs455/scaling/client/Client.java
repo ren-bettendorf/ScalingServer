@@ -95,7 +95,7 @@ public class Client {
 		}
 	}
 	
-	private void (SelectionKey key) {
+	private void connect(SelectionKey key) throws IOException {
 		SocketChannel channel = (SocketChannel)key.channel();
 		// Wait for channel to finish connecting
 		channel.finishConnect();
