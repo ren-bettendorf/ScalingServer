@@ -110,10 +110,7 @@ public class Server {
 	}
 
 	private void read(SelectionKey key) throws IOException {
-		SocketChannel channel = (SocketChannel) key.channel();
-		State state = (State) key.attachment();
-		if(!state.getReadingState()) {
-			threadPoolManager.addTask(new ReadTask(key, selector, threadPoolManager, messageTracker));
-		}
+		key.interestOps(SelectionKey.OP_WRITE);
+		threadPoolManager.addTask(new ReadTask(key, selector, threadPoolManager, messageTracker));
 	}
 }

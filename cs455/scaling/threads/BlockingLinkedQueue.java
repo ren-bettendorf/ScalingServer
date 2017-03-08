@@ -1,10 +1,11 @@
-package cs455.scaling.threads;
+/*package cs455.scaling.threads;
 
+import java.util.Queue;
 import java.util.LinkedList;
 
 public class BlockingLinkedQueue {
 
-	private LinkedList<Task> tasks;
+	private Queue<Task> tasks;
 
 	public BlockingLinkedQueue() {
 		tasks = new LinkedList<Task>();
@@ -30,3 +31,4 @@ public class BlockingLinkedQueue {
 		return tasks.isEmpty();
 	}
 }
+*/

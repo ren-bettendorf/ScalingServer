@@ -53,7 +53,6 @@ public class ReadTask extends Task{
 				System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
 				System.out.println("READING: Data Size: "+ data.length);
 				messageTracker.incrementMessageThroughput();
-				key.interestOps(SelectionKey.OP_WRITE);
 			//}
 				String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
 				System.out.println("Attaching: " + hashcode);
@@ -63,9 +62,6 @@ public class ReadTask extends Task{
 				ioe.printStackTrace();
 			} catch ( NoSuchAlgorithmException nsae) {
             			nsae.printStackTrace();
-        		}finally {
-				state.setReadingState(false);
-				selector.wakeup();
-			}
+        		}
 	}
 }

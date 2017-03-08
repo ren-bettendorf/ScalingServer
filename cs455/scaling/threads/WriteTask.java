@@ -48,7 +48,7 @@ public class WriteTask extends Task{
             		e.printStackTrace();
         	} finally {
 			state.setWritingState(false);
-			selector.wakeup();
+			key.interestOps(SelectionKey.OP_READ);
 		}
 	}
 }

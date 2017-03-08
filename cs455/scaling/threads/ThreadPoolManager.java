@@ -1,32 +1,39 @@
 package cs455.scaling.threads;
 
+import java.util.Queue;
 import java.util.LinkedList;
 
 public class ThreadPoolManager {
 
 	private ThreadPool threadPool;
-	private BlockingLinkedQueue tasks;
+	private Queue<Task> tasks;
 
 	public ThreadPoolManager() {
-		this.tasks = new BlockingLinkedQueue();
+		this.tasks = new LinkedList<Task>();
 	}
-	
+
 	public void initializeThreadPool(int threadPoolSize) {
 		this.threadPool = new ThreadPool(threadPoolSize, this);
 	}
 
 	public void addTask(Task task) {
-		tasks.add(task);
-		if(threadPool != null && !threadPool.isEmpty()) {
+		synchronized(tasks) {
+			tasks.add(task);
+		}
+		if(!threadPool.isEmpty()) {
 			threadPool.giveWorkerTask(removeTask());
 		}
 	}
 
 	public boolean checkForMoreTasks() {
-		return tasks.isEmpty();
+		synchronized(tasks) {
+			return tasks.isEmpty();
+		}
 	}
-	
+
 	public Task removeTask() {
-		return tasks.poll();
+		synchronized(tasks) {
+			return tasks.poll();
+		}
 	}
 }

@@ -1,10 +1,11 @@
 package cs455.scaling.threads;
 
+import java.util.Queue;
 import java.util.LinkedList;
 
 public class ThreadPool {
 
-	private LinkedList<Worker> threadPool;
+	private Queue<Worker> threadPool;
 	private ThreadPoolManager manager;
 
 	public ThreadPool(int threadPoolSize, ThreadPoolManager manager) {
@@ -20,23 +21,24 @@ public class ThreadPool {
 	}
 
 	public void runTask(Task task) {
+		Worker worker;
 		synchronized(threadPool) {
-			Worker worker = threadPool.poll();
+			worker = threadPool.poll();
+		}
+		if(worker != null) {
 			worker.addTask(task);
 		}
 	}
 
 	public Task addBackToPool(Worker worker) {
 		Task task = null;
-		if(!threadPool.contains(worker)) {
-			if(!manager.checkForMoreTasks()) {
-				System.out.println("Adding task to worker");
-				task = manager.removeTask();
-			} else {
-				System.out.println("No more tasks adding back to pool");
-				synchronized(threadPool) {
-					threadPool.add(worker);
-				}
+		if(!manager.checkForMoreTasks()) {
+			System.out.println("Adding task to worker");
+			task = manager.removeTask();
+		} else {
+			System.out.println("No more tasks adding back to pool");
+			synchronized(threadPool) {
+				threadPool.add(worker);
 			}
 		}
 		return task;
@@ -49,14 +51,10 @@ public class ThreadPool {
 	}
 
 	public boolean isEmpty() {
-		synchronized(threadPool) {
-			return threadPool.isEmpty(); 
-		}
+		return threadPool.isEmpty(); 
 	}
 
 	public int getSize() {
-		synchronized(threadPool) {
-			return threadPool.size();
-		}
+		return threadPool.size();
 	}
 }
