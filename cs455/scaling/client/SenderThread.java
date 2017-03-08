@@ -32,8 +32,11 @@ public class SenderThread implements Runnable {
 	public void run() {
 		SocketChannel channel = (SocketChannel) key.channel();
 		while(true) {
+			// Create random data to be sent to server
 			byte[] dataToBeWritten = createRandomData();
+			// Increment messages sent
 			messageTracker.incrementMessagesSent();
+			// Add the hash from random data to be tracked from server to client message
 			try {
 				String data = HashingFunction.getInstance().SHA1FromBytes(dataToBeWritten);
 				messageTracker.addHashcode(data);
@@ -41,23 +44,23 @@ public class SenderThread implements Runnable {
 			} catch(NoSuchAlgorithmException nsae) {
 				nsae.printStackTrace();
 			}
+			// Wrap the data for sending
 			ByteBuffer buffer = ByteBuffer.wrap(dataToBeWritten);
 			buffer.rewind();
+			// Send the data
 			synchronized(key) {
 				try {
 					channel.write(buffer);
 				}catch(IOException ioe) {
 					ioe.printStackTrace();
 				}finally {
-					//System.out.println("Interested in reading...");
 					key.interestOps(SelectionKey.OP_READ);
 					selector.wakeup();
 				}
 			}
 			
-
+			// Sleep until ready to send next message
 			try {
-				//System.out.println("Sleeping for " + messageRate);
 				Thread.sleep( messageRate );
 			} catch(Exception e) {
 				e.printStackTrace();

@@ -29,39 +29,40 @@ public class ReadTask extends Task{
 
 	@Override
 	public void startTask() {
-		State state = (State) key.attachment();
-		state.setReadingState(true);
+		// Get buffer ready for reading
 		ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
 		int read = 0;
 		buffer.clear();
 
-			try {
-
-				while(buffer.hasRemaining() && read != -1) {
-            				read = channel.read(buffer);
-				}
-
-            			if (read == -1) {
-                			System.out.println("Connection closed by client: " + channel.socket().getRemoteSocketAddress());
-					messageTracker.decrementActiveConnections(channel.socket().getRemoteSocketAddress().toString());
-                			channel.close();
-                			key.cancel();
-                			return;
-            			}
-				byte[] data = new byte[bufferSize];
-			//synchronized(key) {
-				System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
-				System.out.println("READING: Data Size: "+ data.length);
-				messageTracker.incrementMessageThroughput();
-			//}
-				String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
-				System.out.println("Attaching: " + hashcode);
-	            		//state.setData(hashcode);
-				threadPoolManager.addTask(new WriteTask(key, selector, hashcode, messageTracker));
-        		} catch (IOException ioe ) {
+		try {	
+			// Read entire buffer
+			while(buffer.hasRemaining() && read != -1) {
+						read = channel.read(buffer);
+			}
+			// Check for an error while reading
+			if (read == -1) {
+				System.out.println("Connection closed by client: " + channel.socket().getRemoteSocketAddress());
+				messageTracker.decrementActiveConnections(channel.socket().getRemoteSocketAddress().toString());
+				channel.close();
+				key.cancel();
 				return;
-			} catch ( NoSuchAlgorithmException nsae) {
-            			nsae.printStackTrace();
-        		}
+			}
+			
+			// Copy data from buffer to an array
+			byte[] data = new byte[bufferSize];
+			System.arraycopy(buffer.array(), 0, data, 0, bufferSize);
+			// Increment throughput counter
+			messageTracker.incrementMessageThroughput();
+			// Generate SHA1 hash from data from buffer
+			String hashcode = HashingFunction.getInstance().SHA1FromBytes(data);
+			System.out.println("Attaching: " + hashcode);
+			// Create and add a writing task to the thread pool
+			threadPoolManager.addTask(new WriteTask(key, selector, hashcode, messageTracker));
+			
+		} catch (IOException ioe ) {
+			return;
+		} catch ( NoSuchAlgorithmException nsae) {
+			nsae.printStackTrace();
+		}
 	}
 }

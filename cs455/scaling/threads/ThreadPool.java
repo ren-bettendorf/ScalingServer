@@ -21,16 +21,19 @@ public class ThreadPool {
 	}
 
 	public void runTask(Task task) {
+		// Check to see if there is a worker to run task
 		Worker worker;
 		synchronized(threadPool) {
 			worker = threadPool.poll();
 		}
+		// If available worker run the task
 		if(worker != null) {
 			worker.addTask(task);
 		}
 	}
 
 	public Task addBackToPool(Worker worker) {
+		// Check threadpoolmanager for more tasks if yes then run another task otherwise add back to pool
 		Task task = null;
 		if(!manager.checkForMoreTasks()) {
 			System.out.println("Adding task to worker");
@@ -43,7 +46,7 @@ public class ThreadPool {
 		}
 		return task;
 	}
-
+	
 	public void giveWorkerTask(Task task) {
 		if(!isEmpty()) {
 			runTask(task);
@@ -52,9 +55,5 @@ public class ThreadPool {
 
 	public boolean isEmpty() {
 		return threadPool.isEmpty(); 
-	}
-
-	public int getSize() {
-		return threadPool.size();
 	}
 }

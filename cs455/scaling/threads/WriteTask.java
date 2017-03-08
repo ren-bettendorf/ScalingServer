@@ -27,27 +27,20 @@ public class WriteTask extends Task{
 
 	@Override
 	public void startTask() {
-		State state = (State)key.attachment();
-		/*String data = state.getData();
-		if(data == null) {
-			System.out.println("Data is null");
-			return;
-		}*/
-
-		state.setWritingState(true);
 		try {
-	        	System.out.println("Writing[" + data.getBytes().length + "]: " + data );
+			System.out.println("Writing[" + data.getBytes().length + "]: " + data );
+			// Wrap data for sending
 			ByteBuffer buffer = ByteBuffer.wrap(data.getBytes());
-        		buffer.rewind();
-			//synchronized(key) {
-				channel.write(buffer);
-            			key.interestOps(SelectionKey.OP_READ);
-			//}
+			buffer.rewind();
+			// Write data to client
+			channel.write(buffer);
+			// Set key open for reading again
+			key.interestOps(SelectionKey.OP_READ);
+			// Increment throughput
 			messageTracker.incrementMessageThroughput();
-        	} catch (IOException e) {
-            		e.printStackTrace();
-        	} finally {
-			state.setWritingState(false);
+		} catch (IOException e) {
+				e.printStackTrace();
+		} finally {
 			key.interestOps(SelectionKey.OP_READ);
 		}
 	}
