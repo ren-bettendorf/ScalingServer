@@ -51,13 +51,18 @@ public class ClientMessageTracker implements Runnable {
 
 	@Override
 	public void run() {
+		// Create the time we will wait until
 		LocalDateTime messageTime = LocalDateTime.now().plusSeconds(messageRate);
 		while(true) {
+			// Get current time
 			LocalDateTime current = LocalDateTime.now();
+			// Check to see if time is after the print time
 			if(current.isAfter(messageTime)) {
+				// Set next print time
 				messageTime = current.plusSeconds(messageRate);
 				synchronized(lock) {
 					System.out.println("[" + messageTime.format(formatter) + "] Total Sent Count: " + messageSent + ", Total Received Count: " + messageReceived );
+					// Reset tracker
 					messageSent = 0;
 					messageReceived = 0;
 				}

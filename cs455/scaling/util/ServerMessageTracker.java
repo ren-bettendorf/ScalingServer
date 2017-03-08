@@ -44,13 +44,18 @@ public class ServerMessageTracker implements Runnable {
 
 	@Override
 	public void run() {
+		// Create the time we will wait until
 		LocalDateTime messageTime = LocalDateTime.now().plusSeconds(messageRate);
 		while(true) {
+			// Get current time
 			LocalDateTime current = LocalDateTime.now();
+			// Check to see if time is after the print time
 			if(current.isAfter(messageTime)) {
+				// Set next print time
 				messageTime = current.plusSeconds(messageRate);
 				synchronized(lock) {
 					System.out.println("[" + messageTime.format(formatter) + "] Current Server Throughput: " + Math.floor(messageThroughput/5.0) + " message/s, Active Clients: " + activeConnections.size() );
+					// Reset tracker
 					messageThroughput = 0;
 				}
 			}
