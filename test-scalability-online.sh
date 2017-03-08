@@ -31,7 +31,7 @@ do
 	for i in `cat machine_list`
 	do
 		echo 'logging into '$i
-		FOLDER="/tmp/$USER/cs455/HW2-PC"
+		FOLDER="/outputs"
 		FILE="$FOLDER/$j"
 		ssh $i "mkdir -p $FOLDER;touch $FILE;$SCRIPT$FILE &"
 	done
