@@ -59,7 +59,7 @@ public class ReadTask extends Task{
 	            		//state.setData(hashcode);
 				threadPoolManager.addTask(new WriteTask(key, selector, hashcode, messageTracker));
         		} catch (IOException ioe ) {
-				ioe.printStackTrace();
+				return;
 			} catch ( NoSuchAlgorithmException nsae) {
             			nsae.printStackTrace();
         		}
